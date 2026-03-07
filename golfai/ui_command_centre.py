@@ -1,7 +1,11 @@
-
 """
 GolfAI Command Centre
-Version: v0.7
+Version: v0.8
+
+Changes in v0.8:
+- Added CSV upload for Streamlit Cloud use
+- Uses uploaded file when present
+- Falls back to local session list if available
 """
 
 import streamlit as st
@@ -11,6 +15,7 @@ from matplotlib.patches import Ellipse
 
 from golfai.data_loader import list_sessions
 from golfai.engine import run_golfai_analysis
+
 
 def render_shot_pattern_chart(data):
     points = data.get("shot_pattern_points", [])
@@ -50,21 +55,32 @@ def render_shot_pattern_chart(data):
 
     st.pyplot(fig)
 
+
 def command_centre_page():
     st.title("GolfAI Command Centre")
 
-    sessions = list_sessions()
-    if not sessions:
-        st.error("No session files found.")
-        return
-
-    selected_session = st.selectbox(
-        "Select Session",
-        sessions,
-        index=len(sessions) - 1
+    uploaded_file = st.file_uploader(
+        "Upload MLM2PRO session CSV",
+        type=["csv"]
     )
 
-    data = run_golfai_analysis(selected_session)
+    data = None
+
+    if uploaded_file is not None:
+        data = run_golfai_analysis(uploaded_file=uploaded_file)
+    else:
+        sessions = list_sessions()
+        if sessions:
+            selected_session = st.selectbox(
+                "Select Session",
+                sessions,
+                index=len(sessions) - 1
+            )
+            data = run_golfai_analysis(session_file=selected_session)
+        else:
+            st.info("Upload an MLM2PRO CSV to begin analysis.")
+            return
+
     practice_plan = data.get("practice_plan", {})
 
     st.caption(

@@ -1,10 +1,13 @@
-
 """
 GolfAI Engine
-Version: v1.1
+Version: v1.2
+
+Changes in v1.2:
+- Added uploaded CSV support
+- Works with local session files or uploaded file objects
 """
 
-from golfai.data_loader import load_session
+from golfai.data_loader import load_session, load_uploaded_session
 from golfai.detectors import (
     compute_strike_quality,
     compute_start_line_control,
@@ -22,8 +25,9 @@ from golfai.config import CARRY_STD_GOOD, CARRY_STD_BAD
 from golfai.scoring import build_session_score
 from golfai.practice_coach import build_practice_plan
 
-def run_golfai_analysis(session_file=None):
-    if session_file is None:
+
+def run_golfai_analysis(session_file=None, uploaded_file=None):
+    if session_file is None and uploaded_file is None:
         return {
             "session_file": "None selected",
             "shots_analysed": 0,
@@ -40,12 +44,18 @@ def run_golfai_analysis(session_file=None):
             "practice_plan": {}
         }
 
-    df = load_session(session_file)
+    if uploaded_file is not None:
+        df = load_uploaded_session(uploaded_file)
+        session_label = getattr(uploaded_file, "name", "Uploaded CSV")
+    else:
+        df = load_session(session_file)
+        session_label = session_file
+
     shots = len(df)
 
     if shots == 0:
         return {
-            "session_file": session_file,
+            "session_file": session_label,
             "shots_analysed": 0,
             "performance_score": 0,
             "primary_issue": "No 7-iron shots found",
@@ -119,7 +129,7 @@ def run_golfai_analysis(session_file=None):
     }
 
     result = {
-        "session_file": session_file,
+        "session_file": session_label,
         "shots_analysed": shots,
         **scoring_results,
         "practice_focus": [
@@ -148,7 +158,5 @@ def run_golfai_analysis(session_file=None):
             "bp_start_max": 0.0,
         })
 
-    practice_plan = build_practice_plan(result)
-    result["practice_plan"] = practice_plan
-
+    result["practice_plan"] = build_practice_plan(result)
     return result
