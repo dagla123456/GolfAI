@@ -1,17 +1,30 @@
 """
 GolfAI Streamlit App
-Version: v0.4
+Version: v1.1
 
-Purpose:
-Stable entry point for GolfAI Streamlit use.
+Change Summary:
+- Adds sidebar navigation
+- Supports Command Centre
+- Supports On-Course Mode
 """
 
 import streamlit as st
+
 from golfai.ui_command_centre import command_centre_page
+from golfai.oncourse_ui import oncourse_page
 
 st.set_page_config(
     page_title="GolfAI",
     layout="wide"
 )
 
-command_centre_page()
+page = st.sidebar.selectbox(
+    "GolfAI",
+    ["Command Centre", "On Course"]
+)
+
+if page == "Command Centre":
+    command_centre_page()
+
+elif page == "On Course":
+    oncourse_page()
