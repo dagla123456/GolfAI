@@ -1,11 +1,12 @@
 """
 GolfAI Command Centre
-Version: v0.8
+Version: v0.9
 
-Changes in v0.8:
-- Added CSV upload for Streamlit Cloud use
-- Uses uploaded file when present
-- Falls back to local session list if available
+Changes in v0.9:
+- Added Trend Dashboard
+- Shows trend charts when session history exists
+- Shows friendly message when no history yet
+- Keeps CSV upload workflow
 """
 
 import streamlit as st
@@ -15,6 +16,7 @@ from matplotlib.patches import Ellipse
 
 from golfai.data_loader import list_sessions
 from golfai.engine import run_golfai_analysis
+from golfai.trends import build_trend_data
 
 
 def render_shot_pattern_chart(data):
@@ -53,6 +55,16 @@ def render_shot_pattern_chart(data):
     ax.set_ylabel("Carry Distance (m)")
     ax.grid(True, linewidth=0.5)
 
+    st.pyplot(fig)
+
+
+def render_trend_chart(x, y, title, y_label):
+    fig, ax = plt.subplots(figsize=(6, 3.5))
+    ax.plot(x, y, marker="o")
+    ax.set_title(title)
+    ax.set_xlabel("Session")
+    ax.set_ylabel(y_label)
+    ax.grid(True, linewidth=0.5)
     st.pyplot(fig)
 
 
@@ -113,6 +125,46 @@ def command_centre_page():
     t2.metric("Attack Window", practice_plan.get("target_attack_window", "-"))
     t3.metric("Launch Window", practice_plan.get("target_launch_direction", "-"))
     t4.metric("Path Window", practice_plan.get("target_path_window", "-"))
+
+    st.divider()
+
+    st.subheader("Trend Dashboard")
+    trend_data = build_trend_data()
+
+    if not trend_data.get("has_history", False):
+        st.info("Trend history will appear after session summaries begin accumulating.")
+    else:
+        tr1, tr2 = st.columns(2)
+        with tr1:
+            render_trend_chart(
+                trend_data["sessions"],
+                trend_data["performance"],
+                "Performance Trend",
+                "Score"
+            )
+        with tr2:
+            render_trend_chart(
+                trend_data["sessions"],
+                trend_data["blueprint"],
+                "Blueprint Match Trend",
+                "%"
+            )
+
+        tr3, tr4 = st.columns(2)
+        with tr3:
+            render_trend_chart(
+                trend_data["sessions"],
+                trend_data["lowpoint"],
+                "Low Point Stability Trend",
+                "Score"
+            )
+        with tr4:
+            render_trend_chart(
+                trend_data["sessions"],
+                trend_data["dispersion"],
+                "Dispersion Corridor Trend",
+                "%"
+            )
 
     st.divider()
 
