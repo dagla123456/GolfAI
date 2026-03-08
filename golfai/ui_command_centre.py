@@ -1,21 +1,19 @@
 """
 GolfAI Command Centre
-Version: v2.1
+Version: v2.2
 
 Change Summary:
-- Adds professional UI styling closer to mock-up
-- Dark green header
-- Styled session summary cards
-- Styled overview cards
-- Target windows bar
-- Green/red comparison indicators
+- Keeps professional UI styling
 - Keeps tabbed layout
+- Persists uploaded session across page navigation
+- Fixes uploaded file handling using session_state
 """
 
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
+from io import BytesIO
 
 from golfai.data_loader import list_sessions
 from golfai.engine import run_golfai_analysis
@@ -363,38 +361,18 @@ def render_trend_dashboard():
         tr1, tr2 = st.columns(2)
 
         with tr1:
-            render_trend_chart(
-                trend["dates"],
-                trend["performance"],
-                "Performance Trend",
-                "Score"
-            )
+            render_trend_chart(trend["dates"], trend["performance"], "Performance Trend", "Score")
 
         with tr2:
-            render_trend_chart(
-                trend["dates"],
-                trend["blueprint"],
-                "Blueprint Trend",
-                "%"
-            )
+            render_trend_chart(trend["dates"], trend["blueprint"], "Blueprint Trend", "%")
 
         tr3, tr4 = st.columns(2)
 
         with tr3:
-            render_trend_chart(
-                trend["dates"],
-                trend["lowpoint"],
-                "Low Point Stability Trend",
-                "Score"
-            )
+            render_trend_chart(trend["dates"], trend["lowpoint"], "Low Point Stability Trend", "Score")
 
         with tr4:
-            render_trend_chart(
-                trend["dates"],
-                trend["dispersion"],
-                "Dispersion Corridor Trend",
-                "%"
-            )
+            render_trend_chart(trend["dates"], trend["dispersion"], "Dispersion Corridor Trend", "%")
     else:
         st.info("Trend history will appear after multiple sessions.")
 
@@ -403,10 +381,7 @@ def render_swing_section(data):
     st.subheader("Swing Blueprint")
 
     b1, b2 = st.columns(2)
-    b1.metric(
-        "Blueprint Matches",
-        f"{data.get('blueprint_matches', 0)} / {data.get('blueprint_total', 0)}"
-    )
+    b1.metric("Blueprint Matches", f"{data.get('blueprint_matches', 0)} / {data.get('blueprint_total', 0)}")
     b2.metric("Match %", f"{data.get('blueprint_match_pct', 0)}%")
 
     st.write(
@@ -421,7 +396,6 @@ def render_swing_section(data):
     st.subheader("Session Intelligence")
 
     s1, s2 = st.columns(2)
-
     s1.metric("Momentum", data.get("momentum_label", "-"), f"{data.get('momentum_delta', 0)}")
 
     if data.get("drift_detected", False):
@@ -507,15 +481,34 @@ def command_centre_page():
     inject_styles()
     render_title()
 
+    if "latest_upload_bytes" not in st.session_state:
+        st.session_state["latest_upload_bytes"] = None
+    if "latest_upload_name" not in st.session_state:
+        st.session_state["latest_upload_name"] = None
+
     uploaded_file = st.file_uploader(
         "Upload CSV / Select Session",
-        type=["csv"]
+        type=["csv"],
+        key="command_centre_upload"
     )
+
+    if uploaded_file is not None:
+        st.session_state["latest_upload_bytes"] = uploaded_file.getvalue()
+        st.session_state["latest_upload_name"] = uploaded_file.name
 
     data = None
 
-    if uploaded_file is not None:
-        data = run_golfai_analysis(uploaded_file=uploaded_file)
+    if st.session_state["latest_upload_bytes"] is not None:
+        file_like = BytesIO(st.session_state["latest_upload_bytes"])
+        file_like.name = st.session_state["latest_upload_name"]
+        data = run_golfai_analysis(uploaded_file=file_like)
+
+        st.caption(f"Loaded session: {st.session_state['latest_upload_name']}")
+        if st.button("Clear uploaded session"):
+            st.session_state["latest_upload_bytes"] = None
+            st.session_state["latest_upload_name"] = None
+            st.rerun()
+
     else:
         sessions = list_sessions()
 

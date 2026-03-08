@@ -1,13 +1,16 @@
 """
 GolfAI Data Loader
-Version: v0.2
+Version: v0.3
 
-Changes in v0.2:
-- Added uploaded CSV support
-- Keeps local session listing/loading for non-cloud use
+Changes in v0.3:
+- Added robust uploaded CSV loading from bytes
+- Supports Streamlit reruns and page switching safely
+- Keeps local session listing/loading
 """
 
 import os
+from io import BytesIO
+
 import pandas as pd
 from golfai.config import DATA_FOLDER, DEFAULT_CLUB_FILTER
 
@@ -33,6 +36,32 @@ def load_session(session_file, club_filter=DEFAULT_CLUB_FILTER):
     return filter_club(df, club_filter=club_filter)
 
 
-def load_uploaded_session(uploaded_file, club_filter=DEFAULT_CLUB_FILTER):
-    df = pd.read_csv(uploaded_file)
+def load_uploaded_session(uploaded_source, club_filter=DEFAULT_CLUB_FILTER):
+    """
+    Supports:
+    - Streamlit UploadedFile
+    - raw bytes
+    - BytesIO
+    """
+
+    if uploaded_source is None:
+        raise ValueError("No uploaded source provided.")
+
+    if isinstance(uploaded_source, bytes):
+        buffer = BytesIO(uploaded_source)
+    elif isinstance(uploaded_source, BytesIO):
+        buffer = uploaded_source
+        buffer.seek(0)
+    else:
+        # Assume Streamlit UploadedFile-like object
+        try:
+            raw_bytes = uploaded_source.getvalue()
+            buffer = BytesIO(raw_bytes)
+        except Exception:
+            # Final fallback
+            if hasattr(uploaded_source, "seek"):
+                uploaded_source.seek(0)
+            buffer = uploaded_source
+
+    df = pd.read_csv(buffer)
     return filter_club(df, club_filter=club_filter)
