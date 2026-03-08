@@ -1,10 +1,11 @@
 """
 GolfAI Engine
-Version: v1.2
+Version: v1.3
 
-Changes in v1.2:
-- Added uploaded CSV support
-- Works with local session files or uploaded file objects
+Changes in v1.3:
+- Added session history foundation
+- Saves lightweight session summaries after analysis
+- Still supports CSV upload workflow
 """
 
 from golfai.data_loader import load_session, load_uploaded_session
@@ -24,6 +25,7 @@ from golfai.metrics import safe_std, bounded_score
 from golfai.config import CARRY_STD_GOOD, CARRY_STD_BAD
 from golfai.scoring import build_session_score
 from golfai.practice_coach import build_practice_plan
+from golfai.session_history import save_session_summary
 
 
 def run_golfai_analysis(session_file=None, uploaded_file=None):
@@ -159,4 +161,19 @@ def run_golfai_analysis(session_file=None, uploaded_file=None):
         })
 
     result["practice_plan"] = build_practice_plan(result)
+
+    # Save lightweight summary for future trend intelligence
+    history_summary = {
+        "session_file": result.get("session_file"),
+        "performance_score": result.get("performance_score"),
+        "primary_issue": result.get("primary_issue"),
+        "sequencing_score": result.get("sequencing_score"),
+        "lowpoint_score": result.get("lowpoint_score"),
+        "strike_quality": result.get("strike_quality"),
+        "blueprint_match_pct": result.get("blueprint_match_pct"),
+        "corridor_pct": result.get("corridor_pct"),
+    }
+
+    save_session_summary(history_summary)
+
     return result
