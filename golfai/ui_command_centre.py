@@ -1,11 +1,12 @@
 """
 GolfAI Command Centre
-Version: v1.2
+Version: v1.3
 
 Change Summary:
 - Restores full Command Centre layout
 - Keeps GolfAI Diagnosis summary panel
 - Keeps date-based Trend Dashboard
+- Adds Session Comparison section
 - Keeps CSV upload workflow
 - Restores Blueprint, Session Intelligence,
   Mechanics Snapshot, Dispersion Intelligence,
@@ -20,6 +21,7 @@ from matplotlib.patches import Ellipse
 from golfai.data_loader import list_sessions
 from golfai.engine import run_golfai_analysis
 from golfai.trends import build_trend_data
+from golfai.comparison import compare_latest_sessions
 
 
 def render_summary_panel(data):
@@ -100,6 +102,47 @@ def render_trend_chart(x, y, title, ylabel):
     st.pyplot(fig)
 
 
+def render_comparison_section():
+    st.subheader("Session Comparison")
+
+    comparison = compare_latest_sessions()
+
+    if not comparison.get("has_comparison", False):
+        st.info(comparison.get("message", "Comparison unavailable."))
+        st.divider()
+        return
+
+    st.caption(
+        f"Previous: {comparison.get('previous_session', 'Previous')}  |  "
+        f"Current: {comparison.get('current_session', 'Current')}"
+    )
+
+    c1, c2, c3, c4 = st.columns(4)
+
+    c1.metric(
+        "Performance",
+        comparison.get("performance_curr", 0),
+        comparison.get("performance_delta", 0)
+    )
+    c2.metric(
+        "Blueprint %",
+        comparison.get("blueprint_curr", 0),
+        comparison.get("blueprint_delta", 0)
+    )
+    c3.metric(
+        "Low Point",
+        comparison.get("lowpoint_curr", 0),
+        comparison.get("lowpoint_delta", 0)
+    )
+    c4.metric(
+        "Corridor %",
+        comparison.get("corridor_curr", 0),
+        comparison.get("corridor_delta", 0)
+    )
+
+    st.divider()
+
+
 def command_centre_page():
     st.title("GolfAI Command Centre")
 
@@ -126,14 +169,8 @@ def command_centre_page():
             st.info("Upload an MLM2PRO CSV to begin analysis.")
             return
 
-    # --------------------------------
-    # SUMMARY PANEL
-    # --------------------------------
     render_summary_panel(data)
 
-    # --------------------------------
-    # PRACTICE PLAN
-    # --------------------------------
     st.subheader("Practice Plan")
 
     plan = data.get("practice_plan", {})
@@ -156,9 +193,8 @@ def command_centre_page():
 
     st.divider()
 
-    # --------------------------------
-    # TREND DASHBOARD
-    # --------------------------------
+    render_comparison_section()
+
     st.subheader("Trend Dashboard")
 
     trend = build_trend_data()
@@ -204,9 +240,6 @@ def command_centre_page():
 
     st.divider()
 
-    # --------------------------------
-    # SWING BLUEPRINT
-    # --------------------------------
     st.subheader("Swing Blueprint")
 
     b1, b2 = st.columns(2)
@@ -225,9 +258,6 @@ def command_centre_page():
 
     st.divider()
 
-    # --------------------------------
-    # SESSION INTELLIGENCE
-    # --------------------------------
     st.subheader("Session Intelligence")
 
     s1, s2 = st.columns(2)
@@ -246,9 +276,6 @@ def command_centre_page():
 
     st.divider()
 
-    # --------------------------------
-    # MECHANICS SNAPSHOT
-    # --------------------------------
     st.subheader("Mechanics Snapshot")
 
     m1, m2, m3, m4 = st.columns(4)
@@ -259,9 +286,6 @@ def command_centre_page():
 
     st.divider()
 
-    # --------------------------------
-    # DISPERSION INTELLIGENCE
-    # --------------------------------
     st.subheader("Dispersion Intelligence")
 
     d1, d2, d3 = st.columns(3)
@@ -277,17 +301,11 @@ def command_centre_page():
 
     st.divider()
 
-    # --------------------------------
-    # SHOT PATTERN
-    # --------------------------------
     st.subheader("Shot Pattern")
     render_shot_pattern_chart(data)
 
     st.divider()
 
-    # --------------------------------
-    # KEY METRICS
-    # --------------------------------
     st.subheader("Key Metrics")
 
     k1, k2, k3 = st.columns(3)
@@ -297,9 +315,6 @@ def command_centre_page():
 
     st.divider()
 
-    # --------------------------------
-    # DIAGNOSTICS
-    # --------------------------------
     with st.expander("Low Point Diagnostics"):
         st.write(
             f"Carry CV: {data.get('carry_cv', 0)} | "
