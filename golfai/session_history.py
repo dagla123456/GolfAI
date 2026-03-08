@@ -1,9 +1,8 @@
 """
 GolfAI Session History
-Version: v0.1
+Version: v0.2
 
-Stores lightweight session summaries so GolfAI
-can build trend intelligence later.
+Stores session summaries and prevents duplicate entries.
 """
 
 import json
@@ -21,8 +20,16 @@ def load_history():
 
 
 def save_session_summary(summary):
-
     history = load_history()
+
+    session_id = summary.get("session_id")
+
+    if session_id is None:
+        return history
+
+    for session in history:
+        if session.get("session_id") == session_id:
+            return history
 
     history.append(summary)
 

@@ -1,11 +1,20 @@
 """
 GolfAI Engine
-Version: v1.3
+Version: v1.4
 
-Changes in v1.3:
-- Added session history foundation
-- Saves lightweight session summaries after analysis
-- Still supports CSV upload workflow
+Change Summary:
+- Supports uploaded CSV analysis
+- Supports local session file analysis
+- Keeps practice plan generation
+- Keeps session history saving
+- Adds session_id into history summaries
+- Enables duplicate session protection via session_history.py
+
+Notes:
+- session_id uses:
+    session_file + shots_analysed
+- example:
+    mlm2pro_shotexport_030726.csv_62
 """
 
 from golfai.data_loader import load_session, load_uploaded_session
@@ -72,6 +81,9 @@ def run_golfai_analysis(session_file=None, uploaded_file=None):
             "practice_plan": {}
         }
 
+    # -----------------------------------
+    # Detector layer
+    # -----------------------------------
     strike_quality, strike_diag = compute_strike_quality(df)
     start_line_control, start_diag = compute_start_line_control(df)
     lowpoint_score, lp_diag = compute_lowpoint_score(df)
@@ -110,6 +122,9 @@ def run_golfai_analysis(session_file=None, uploaded_file=None):
         **shot_pattern_diag,
     }
 
+    # -----------------------------------
+    # Scoring layer
+    # -----------------------------------
     scoring_results = build_session_score(detector_results)
 
     one_cue = "Pause at the top, let the arms fall, then turn."
@@ -130,6 +145,9 @@ def run_golfai_analysis(session_file=None, uploaded_file=None):
         "corridor_pct": dispersion_diag.get("corridor_pct", 0),
     }
 
+    # -----------------------------------
+    # Base result
+    # -----------------------------------
     result = {
         "session_file": session_label,
         "shots_analysed": shots,
@@ -160,11 +178,18 @@ def run_golfai_analysis(session_file=None, uploaded_file=None):
             "bp_start_max": 0.0,
         })
 
+    # -----------------------------------
+    # Practice coach
+    # -----------------------------------
     result["practice_plan"] = build_practice_plan(result)
 
-    # Save lightweight summary for future trend intelligence
+    # -----------------------------------
+    # Session history summary
+    # -----------------------------------
     history_summary = {
+        "session_id": f"{result.get('session_file')}_{result.get('shots_analysed')}",
         "session_file": result.get("session_file"),
+        "shots_analysed": result.get("shots_analysed"),
         "performance_score": result.get("performance_score"),
         "primary_issue": result.get("primary_issue"),
         "sequencing_score": result.get("sequencing_score"),
