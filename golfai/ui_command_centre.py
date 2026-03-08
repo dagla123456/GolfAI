@@ -1,16 +1,15 @@
 """
 GolfAI Command Centre
-Version: v2.0
+Version: v2.1
 
 Change Summary:
-- Introduces tabbed Command Centre layout
-- Reduces scrolling
-- Improves stat comparability
-- Keeps Diagnosis summary panel
-- Keeps Practice Plan, Comparison, Trends,
-  Swing Blueprint, Session Intelligence,
-  Mechanics Snapshot, Dispersion Intelligence,
-  Shot Pattern, Key Metrics, Diagnostics
+- Adds professional UI styling closer to mock-up
+- Dark green header
+- Styled session summary cards
+- Styled overview cards
+- Target windows bar
+- Green/red comparison indicators
+- Keeps tabbed layout
 """
 
 import streamlit as st
@@ -24,27 +23,196 @@ from golfai.trends import build_trend_data
 from golfai.comparison import compare_latest_sessions
 
 
+def inject_styles():
+    st.markdown("""
+    <style>
+    .main-title {
+        background: linear-gradient(90deg, #173f2d, #214d39);
+        color: white;
+        padding: 1.1rem 1.4rem;
+        border-radius: 0.8rem;
+        font-size: 2.2rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        margin-bottom: 1rem;
+    }
+
+    .section-label {
+        background: #f1f2f5;
+        border-radius: 0.5rem;
+        padding: 0.35rem 0.8rem;
+        text-align: center;
+        font-weight: 700;
+        color: #2f3440;
+        margin-bottom: 0.7rem;
+    }
+
+    .summary-card {
+        background: white;
+        border: 1px solid #e7e9ef;
+        border-radius: 0.7rem;
+        padding: 1rem 1.1rem;
+        min-height: 92px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        margin-bottom: 0.6rem;
+    }
+
+    .summary-label {
+        font-size: 0.95rem;
+        color: #5b6270;
+        margin-bottom: 0.25rem;
+    }
+
+    .summary-value {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #1f2430;
+    }
+
+    .summary-value-green {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #167c35;
+    }
+
+    .card {
+        background: white;
+        border: 1px solid #e7e9ef;
+        border-radius: 0.7rem;
+        padding: 1rem 1.1rem;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        margin-bottom: 1rem;
+    }
+
+    .card-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #1f2430;
+        margin-bottom: 0.7rem;
+    }
+
+    .metric-bar {
+        background: white;
+        border: 1px solid #e7e9ef;
+        border-radius: 0.7rem;
+        padding: 0.9rem 1rem;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        margin-top: 0.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .metric-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .metric-item {
+        flex: 1;
+        min-width: 140px;
+    }
+
+    .metric-item-label {
+        font-size: 0.9rem;
+        color: #5b6270;
+    }
+
+    .metric-item-value {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #1f2430;
+    }
+
+    .delta-up {
+        color: #167c35;
+        font-weight: 700;
+    }
+
+    .delta-down {
+        color: #b42318;
+        font-weight: 700;
+    }
+
+    div[data-baseweb="tab-list"] {
+        gap: 0.5rem;
+    }
+
+    button[data-baseweb="tab"] {
+        background: #eceef3 !important;
+        border-radius: 0.6rem 0.6rem 0 0 !important;
+        padding: 0.65rem 1rem !important;
+    }
+
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background: #1f4a35 !important;
+        color: white !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+
+def render_title():
+    st.markdown('<div class="main-title">GOLF AI COMMAND CENTRE</div>', unsafe_allow_html=True)
+
+
 def render_summary_panel(data):
-    st.subheader("GolfAI Diagnosis")
+    st.markdown('<div class="section-label">SESSION SUMMARY</div>', unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns(3)
+    row1 = st.columns(3)
+    row2 = st.columns(3)
 
-    with col1:
-        st.metric("Primary Issue", data.get("primary_issue", "-"))
-        st.metric("Secondary Issue", data.get("secondary_issue", "-"))
+    with row1[0]:
+        st.markdown(f"""
+        <div class="summary-card">
+            <div class="summary-label">Performance</div>
+            <div class="summary-value">{data.get("performance_score", 0)}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    with col2:
-        st.metric("Momentum", data.get("momentum_label", "-"))
-        if data.get("drift_detected", False):
-            st.error("Swing Drift Detected")
-        else:
-            st.success("Swing Stable")
+    with row1[1]:
+        st.markdown(f"""
+        <div class="summary-card">
+            <div class="summary-label">Primary Issue</div>
+            <div class="summary-value">{data.get("primary_issue", "-")}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    with col3:
-        st.metric("Miss Bias", data.get("miss_bias", "-"))
-        st.metric("Performance Score", data.get("performance_score", 0))
+    with row1[2]:
+        momentum = data.get("momentum_label", "-")
+        momentum_class = "summary-value-green" if "Improving" in str(momentum) or "↑" in str(momentum) else "summary-value"
+        st.markdown(f"""
+        <div class="summary-card">
+            <div class="summary-label">Momentum</div>
+            <div class="{momentum_class}">{momentum}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.divider()
+    with row2[0]:
+        st.markdown(f"""
+        <div class="summary-card">
+            <div class="summary-label">Miss Bias</div>
+            <div class="summary-value">{data.get("miss_bias", "-")}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with row2[1]:
+        st.markdown(f"""
+        <div class="summary-card">
+            <div class="summary-label">Blueprint %</div>
+            <div class="summary-value-green">{data.get("blueprint_match_pct", 0)}%</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with row2[2]:
+        st.markdown(f"""
+        <div class="summary-card">
+            <div class="summary-label">Corridor %</div>
+            <div class="summary-value-green">{data.get("corridor_pct", 0)}%</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
 
 
 def render_shot_pattern_chart(data):
@@ -102,64 +270,88 @@ def render_trend_chart(x, y, title, ylabel):
     st.pyplot(fig)
 
 
-def render_comparison_section():
-    st.subheader("Session Comparison")
+def format_delta_html(value, suffix=""):
+    try:
+        value_num = float(value)
+    except Exception:
+        value_num = 0
 
+    if value_num > 0:
+        return f'<span class="delta-up">▲ +{value_num}{suffix}</span>'
+    elif value_num < 0:
+        return f'<span class="delta-down">▼ {value_num}{suffix}</span>'
+    return f'<span>0{suffix}</span>'
+
+
+def render_comparison_section():
     comparison = compare_latest_sessions()
 
     if not comparison.get("has_comparison", False):
-        st.info(comparison.get("message", "Comparison unavailable."))
+        st.markdown('<div class="card"><div class="card-title">Session Comparison</div><div>Comparison will appear after at least two sessions are stored.</div></div>', unsafe_allow_html=True)
         return
 
-    st.caption(
-        f"Previous: {comparison.get('previous_session', 'Previous')}  |  "
-        f"Current: {comparison.get('current_session', 'Current')}"
-    )
+    performance_delta = format_delta_html(comparison.get("performance_delta", 0))
+    blueprint_delta = format_delta_html(comparison.get("blueprint_delta", 0), "%")
+    lowpoint_delta = format_delta_html(comparison.get("lowpoint_delta", 0))
+    corridor_delta = format_delta_html(comparison.get("corridor_delta", 0), "%")
 
-    c1, c2, c3, c4 = st.columns(4)
-
-    c1.metric(
-        "Performance",
-        comparison.get("performance_curr", 0),
-        comparison.get("performance_delta", 0)
-    )
-    c2.metric(
-        "Blueprint %",
-        comparison.get("blueprint_curr", 0),
-        comparison.get("blueprint_delta", 0)
-    )
-    c3.metric(
-        "Low Point",
-        comparison.get("lowpoint_curr", 0),
-        comparison.get("lowpoint_delta", 0)
-    )
-    c4.metric(
-        "Corridor %",
-        comparison.get("corridor_curr", 0),
-        comparison.get("corridor_delta", 0)
-    )
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">Session Comparison</div>
+        <div style="margin-bottom:0.7rem; color:#5b6270;">
+            Previous: {comparison.get("previous_session", "Previous")} |
+            Current: {comparison.get("current_session", "Current")}
+        </div>
+        <div style="display:grid; row-gap:0.9rem;">
+            <div><strong>Performance</strong> &nbsp; {comparison.get("performance_prev", 0)} → {comparison.get("performance_curr", 0)} &nbsp; {performance_delta}</div>
+            <div><strong>Blueprint %</strong> &nbsp; {comparison.get("blueprint_prev", 0)} → {comparison.get("blueprint_curr", 0)} &nbsp; {blueprint_delta}</div>
+            <div><strong>Low Point</strong> &nbsp; {comparison.get("lowpoint_prev", 0)} → {comparison.get("lowpoint_curr", 0)} &nbsp; {lowpoint_delta}</div>
+            <div><strong>Corridor %</strong> &nbsp; {comparison.get("corridor_prev", 0)} → {comparison.get("corridor_curr", 0)} &nbsp; {corridor_delta}</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 def render_practice_plan(data):
-    st.subheader("Practice Plan")
-
     plan = data.get("practice_plan", {})
 
-    p1, p2 = st.columns(2)
+    left, right = st.columns(2)
 
-    with p1:
-        st.metric("Plan", plan.get("practice_plan_title", "-"))
-        st.metric("Priority", plan.get("practice_priority", "-"))
-        st.metric("Drill", plan.get("recommended_drill", "-"))
+    with left:
+        st.markdown(f"""
+        <div class="card">
+            <div class="card-title">Practice Plan</div>
+            <div style="margin-bottom:0.9rem;"><strong>Priority:</strong> {plan.get("practice_priority", "-")}</div>
+            <div style="margin-bottom:0.9rem;"><strong>Drill:</strong> {plan.get("recommended_drill", "-")}</div>
+            <div><strong>Goal:</strong> {plan.get("session_goal", "-")}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    with p2:
-        st.info(plan.get("session_goal", "-"))
+    with right:
+        render_comparison_section()
 
-    t1, t2, t3, t4 = st.columns(4)
-    t1.metric("Target Smash", plan.get("target_smash", "-"))
-    t2.metric("Attack Window", plan.get("target_attack_window", "-"))
-    t3.metric("Launch Window", plan.get("target_launch_direction", "-"))
-    t4.metric("Path Window", plan.get("target_path_window", "-"))
+    st.markdown(f"""
+    <div class="metric-bar">
+        <div class="metric-row">
+            <div class="metric-item">
+                <div class="metric-item-label">Target Smash</div>
+                <div class="metric-item-value">{plan.get("target_smash", "-")}</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-item-label">Attack Window</div>
+                <div class="metric-item-value">{plan.get("target_attack_window", "-")}</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-item-label">Launch Window</div>
+                <div class="metric-item-value">{plan.get("target_launch_direction", "-")}</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-item-label">Path Window</div>
+                <div class="metric-item-value">{plan.get("target_path_window", "-")}</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 def render_trend_dashboard():
@@ -312,10 +504,11 @@ def render_diagnostics_section(data):
 
 
 def command_centre_page():
-    st.title("GolfAI Command Centre")
+    inject_styles()
+    render_title()
 
     uploaded_file = st.file_uploader(
-        "Upload MLM2PRO CSV",
+        "Upload CSV / Select Session",
         type=["csv"]
     )
 
@@ -345,8 +538,6 @@ def command_centre_page():
 
     with overview_tab:
         render_practice_plan(data)
-        st.divider()
-        render_comparison_section()
 
     with swing_tab:
         render_swing_section(data)
