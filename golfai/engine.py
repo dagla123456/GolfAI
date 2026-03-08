@@ -1,14 +1,14 @@
 """
 GolfAI Engine
-Version: v1.4
+Version: v1.5
 
 Change Summary:
 - Supports uploaded CSV analysis
 - Supports local session file analysis
 - Keeps practice plan generation
 - Keeps session history saving
-- Adds session_id into history summaries
-- Enables duplicate session protection via session_history.py
+- Keeps duplicate-safe session history
+- Adds session_date into history summaries for time-based trend charts
 
 Notes:
 - session_id uses:
@@ -35,6 +35,7 @@ from golfai.config import CARRY_STD_GOOD, CARRY_STD_BAD
 from golfai.scoring import build_session_score
 from golfai.practice_coach import build_practice_plan
 from golfai.session_history import save_session_summary
+from golfai.trends import extract_session_date
 
 
 def run_golfai_analysis(session_file=None, uploaded_file=None):
@@ -186,9 +187,12 @@ def run_golfai_analysis(session_file=None, uploaded_file=None):
     # -----------------------------------
     # Session history summary
     # -----------------------------------
+    session_date = extract_session_date(result.get("session_file"))
+
     history_summary = {
         "session_id": f"{result.get('session_file')}_{result.get('shots_analysed')}",
         "session_file": result.get("session_file"),
+        "session_date": session_date,
         "shots_analysed": result.get("shots_analysed"),
         "performance_score": result.get("performance_score"),
         "primary_issue": result.get("primary_issue"),

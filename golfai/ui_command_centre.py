@@ -1,12 +1,12 @@
 """
 GolfAI Command Centre
-Version: v0.9
+Version: v1.0
 
-Changes in v0.9:
-- Added Trend Dashboard
-- Shows trend charts when session history exists
-- Shows friendly message when no history yet
+Change Summary:
+- Trend charts now plot by session date
+- Date labels shown on x-axis
 - Keeps CSV upload workflow
+- Keeps current trend dashboard, practice plan, blueprint and diagnostics
 """
 
 import streamlit as st
@@ -59,12 +59,14 @@ def render_shot_pattern_chart(data):
 
 
 def render_trend_chart(x, y, title, y_label):
-    fig, ax = plt.subplots(figsize=(6, 3.5))
+    fig, ax = plt.subplots(figsize=(6.5, 3.8))
     ax.plot(x, y, marker="o")
     ax.set_title(title)
-    ax.set_xlabel("Session")
+    ax.set_xlabel("Session Date")
     ax.set_ylabel(y_label)
     ax.grid(True, linewidth=0.5)
+    plt.xticks(rotation=35, ha="right")
+    plt.tight_layout()
     st.pyplot(fig)
 
 
@@ -137,14 +139,14 @@ def command_centre_page():
         tr1, tr2 = st.columns(2)
         with tr1:
             render_trend_chart(
-                trend_data["sessions"],
+                trend_data["dates"],
                 trend_data["performance"],
                 "Performance Trend",
                 "Score"
             )
         with tr2:
             render_trend_chart(
-                trend_data["sessions"],
+                trend_data["dates"],
                 trend_data["blueprint"],
                 "Blueprint Match Trend",
                 "%"
@@ -153,14 +155,14 @@ def command_centre_page():
         tr3, tr4 = st.columns(2)
         with tr3:
             render_trend_chart(
-                trend_data["sessions"],
+                trend_data["dates"],
                 trend_data["lowpoint"],
                 "Low Point Stability Trend",
                 "Score"
             )
         with tr4:
             render_trend_chart(
-                trend_data["sessions"],
+                trend_data["dates"],
                 trend_data["dispersion"],
                 "Dispersion Corridor Trend",
                 "%"
