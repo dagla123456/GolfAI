@@ -1,12 +1,12 @@
 """
 GolfAI Command Centre
-Version: v1.0
+Version: v1.1
 
 Change Summary:
-- Trend charts now plot by session date
-- Date labels shown on x-axis
+- Adds Command Centre Summary Panel
+- Keeps date-based Trend Dashboard
 - Keeps CSV upload workflow
-- Keeps current trend dashboard, practice plan, blueprint and diagnostics
+- Keeps shot pattern visualization
 """
 
 import streamlit as st
@@ -19,6 +19,29 @@ from golfai.engine import run_golfai_analysis
 from golfai.trends import build_trend_data
 
 
+def render_summary_panel(data):
+    st.subheader("GolfAI Diagnosis")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("Primary Issue", data.get("primary_issue", "-"))
+        st.metric("Secondary Issue", data.get("secondary_issue", "-"))
+
+    with col2:
+        st.metric("Momentum", data.get("momentum_label", "-"))
+        if data.get("drift_detected", False):
+            st.error("Swing Drift Detected")
+        else:
+            st.success("Swing Stable")
+
+    with col3:
+        st.metric("Miss Bias", data.get("miss_bias", "-"))
+        st.metric("Performance Score", data.get("performance_score", 0))
+
+    st.divider()
+
+
 def render_shot_pattern_chart(data):
     points = data.get("shot_pattern_points", [])
 
@@ -28,45 +51,47 @@ def render_shot_pattern_chart(data):
 
     df = pd.DataFrame(points, columns=["Side Carry", "Carry Distance"])
 
-    mean_side = data.get("mean_side", 0.0)
-    mean_carry = data.get("mean_carry", 0.0)
-    ellipse_width = data.get("ellipse_width", 0.0)
-    ellipse_height = data.get("ellipse_height", 0.0)
-    corridor_m = data.get("corridor_m", 5.0)
+    mean_side = data.get("mean_side", 0)
+    mean_carry = data.get("mean_carry", 0)
+    ellipse_width = data.get("ellipse_width", 0)
+    ellipse_height = data.get("ellipse_height", 0)
+    corridor_m = data.get("corridor_m", 5)
 
     fig, ax = plt.subplots(figsize=(7, 6))
-    ax.axvspan(-corridor_m, corridor_m, alpha=0.12)
-    ax.axvline(0, linewidth=1)
-    ax.scatter(df["Side Carry"], df["Carry Distance"], marker="o")
-    ax.scatter([mean_side], [mean_carry], marker="D", s=80)
 
-    if ellipse_width > 0 and ellipse_height > 0:
-        ellipse = Ellipse(
-            (mean_side, mean_carry),
-            width=ellipse_width * 2,
-            height=ellipse_height * 2,
-            fill=False,
-            linewidth=2
-        )
-        ax.add_patch(ellipse)
+    ax.axvspan(-corridor_m, corridor_m, alpha=0.1)
+    ax.axvline(0)
+    ax.scatter(df["Side Carry"], df["Carry Distance"])
+    ax.scatter(mean_side, mean_carry, marker="D", s=80)
+
+    ellipse = Ellipse(
+        (mean_side, mean_carry),
+        width=ellipse_width * 2,
+        height=ellipse_height * 2,
+        fill=False,
+    )
+    ax.add_patch(ellipse)
 
     ax.set_title("Shot Pattern Visualization")
-    ax.set_xlabel("Side Carry (m)  [Left (-) / Right (+)]")
+    ax.set_xlabel("Side Carry (m)")
     ax.set_ylabel("Carry Distance (m)")
     ax.grid(True, linewidth=0.5)
 
     st.pyplot(fig)
 
 
-def render_trend_chart(x, y, title, y_label):
+def render_trend_chart(x, y, title, ylabel):
     fig, ax = plt.subplots(figsize=(6.5, 3.8))
+
     ax.plot(x, y, marker="o")
     ax.set_title(title)
     ax.set_xlabel("Session Date")
-    ax.set_ylabel(y_label)
+    ax.set_ylabel(ylabel)
     ax.grid(True, linewidth=0.5)
+
     plt.xticks(rotation=35, ha="right")
     plt.tight_layout()
+
     st.pyplot(fig)
 
 
@@ -74,7 +99,7 @@ def command_centre_page():
     st.title("GolfAI Command Centre")
 
     uploaded_file = st.file_uploader(
-        "Upload MLM2PRO session CSV",
+        "Upload MLM2PRO CSV",
         type=["csv"]
     )
 
@@ -84,182 +109,92 @@ def command_centre_page():
         data = run_golfai_analysis(uploaded_file=uploaded_file)
     else:
         sessions = list_sessions()
+
         if sessions:
-            selected_session = st.selectbox(
+            selected = st.selectbox(
                 "Select Session",
                 sessions,
                 index=len(sessions) - 1
             )
-            data = run_golfai_analysis(session_file=selected_session)
+            data = run_golfai_analysis(session_file=selected)
         else:
             st.info("Upload an MLM2PRO CSV to begin analysis.")
             return
 
-    practice_plan = data.get("practice_plan", {})
+    # --------------------------------
+    # SUMMARY PANEL
+    # --------------------------------
+    render_summary_panel(data)
 
-    st.caption(
-        f"Session: {data.get('session_file', '-')} | "
-        f"Shots analysed: {data.get('shots_analysed', 0)}"
-    )
-
-    st.subheader("Session Diagnosis")
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Performance", data.get("performance_score", 0))
-    c2.metric("Primary Issue", data.get("primary_issue", "-"))
-    c3.metric("Secondary Issue", data.get("secondary_issue", "-"))
-    c4.metric("One Cue", data.get("one_cue", "-"))
-
-    st.divider()
-
+    # --------------------------------
+    # PRACTICE PLAN
+    # --------------------------------
     st.subheader("Practice Plan")
-    p1, p2 = st.columns([1, 1])
 
-    with p1:
-        st.metric("Plan", practice_plan.get("practice_plan_title", "-"))
-        st.metric("Priority", practice_plan.get("practice_priority", "-"))
-        st.metric("Drill", practice_plan.get("recommended_drill", "-"))
+    plan = data.get("practice_plan", {})
 
-    with p2:
-        st.info(practice_plan.get("session_goal", "-"))
+    col1, col2 = st.columns(2)
 
-    t1, t2, t3, t4 = st.columns(4)
-    t1.metric("Target Smash", practice_plan.get("target_smash", "-"))
-    t2.metric("Attack Window", practice_plan.get("target_attack_window", "-"))
-    t3.metric("Launch Window", practice_plan.get("target_launch_direction", "-"))
-    t4.metric("Path Window", practice_plan.get("target_path_window", "-"))
+    with col1:
+        st.metric("Plan", plan.get("practice_plan_title", "-"))
+        st.metric("Priority", plan.get("practice_priority", "-"))
+        st.metric("Drill", plan.get("recommended_drill", "-"))
+
+    with col2:
+        st.info(plan.get("session_goal", "-"))
 
     st.divider()
 
+    # --------------------------------
+    # TREND DASHBOARD
+    # --------------------------------
     st.subheader("Trend Dashboard")
-    trend_data = build_trend_data()
 
-    if not trend_data.get("has_history", False):
-        st.info("Trend history will appear after session summaries begin accumulating.")
-    else:
-        tr1, tr2 = st.columns(2)
-        with tr1:
+    trend = build_trend_data()
+
+    if trend.get("has_history", False):
+        col1, col2 = st.columns(2)
+
+        with col1:
             render_trend_chart(
-                trend_data["dates"],
-                trend_data["performance"],
+                trend["dates"],
+                trend["performance"],
                 "Performance Trend",
                 "Score"
             )
-        with tr2:
+
+        with col2:
             render_trend_chart(
-                trend_data["dates"],
-                trend_data["blueprint"],
-                "Blueprint Match Trend",
+                trend["dates"],
+                trend["blueprint"],
+                "Blueprint Trend",
                 "%"
             )
 
-        tr3, tr4 = st.columns(2)
-        with tr3:
+        col3, col4 = st.columns(2)
+
+        with col3:
             render_trend_chart(
-                trend_data["dates"],
-                trend_data["lowpoint"],
+                trend["dates"],
+                trend["lowpoint"],
                 "Low Point Stability Trend",
                 "Score"
             )
-        with tr4:
+
+        with col4:
             render_trend_chart(
-                trend_data["dates"],
-                trend_data["dispersion"],
+                trend["dates"],
+                trend["dispersion"],
                 "Dispersion Corridor Trend",
                 "%"
             )
-
-    st.divider()
-
-    st.subheader("Swing Blueprint")
-    b1, b2 = st.columns(2)
-    b1.metric(
-        "Blueprint Matches",
-        f"{data.get('blueprint_matches', 0)} / {data.get('blueprint_total', 0)}"
-    )
-    b2.metric("Match %", f"{data.get('blueprint_match_pct', 0)}%")
-
-    st.write(
-        f"Target Pattern → Smash {data.get('bp_smash_target', 0)} | "
-        f"Path {data.get('bp_path_target', 0)}° | "
-        f"Start {data.get('bp_start_target', 0)}° | "
-        f"Carry {data.get('bp_carry_target', 0)}m"
-    )
-
-    st.divider()
-
-    st.subheader("Session Intelligence")
-    s1, s2 = st.columns(2)
-    s1.metric("Momentum", data.get("momentum_label", "-"), f"{data.get('momentum_delta', 0)}")
-
-    if data.get("drift_detected", False):
-        s2.error("⚠️ Swing Drift Detected")
     else:
-        s2.success("Swing Stable")
-
-    st.write(
-        f"Start Drift: {data.get('drift_start_delta', 0)}° | "
-        f"Path Drift: {data.get('drift_path_delta', 0)}°"
-    )
+        st.info("Trend history will appear after multiple sessions.")
 
     st.divider()
 
-    st.subheader("Mechanics Snapshot")
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Strike", data.get("strike_quality", 0))
-    m2.metric("Start Line", data.get("start_line_control", 0))
-    m3.metric("Sequencing", data.get("sequencing_score", 0))
-    m4.metric("Low Point", data.get("lowpoint_score", 0))
-
-    st.divider()
-
-    st.subheader("Dispersion Intelligence")
-    d1, d2, d3 = st.columns(3)
-    d1.metric("Miss Bias", data.get("miss_bias", "-"))
-    d2.metric("Corridor %", f"{data.get('corridor_pct', 0)}%")
-    d3.metric("Dispersion Area", data.get("dispersion_area", 0))
-
-    st.write(
-        f"Side Avg: {data.get('side_avg', 0)} m | "
-        f"Side Std: {data.get('side_std', 0)} m | "
-        f"Carry Std: {data.get('carry_std_disp', 0)} m"
-    )
-
-    st.divider()
-
-    st.subheader("Shot Pattern Visualization")
+    # --------------------------------
+    # SHOT PATTERN
+    # --------------------------------
+    st.subheader("Shot Pattern")
     render_shot_pattern_chart(data)
-
-    st.divider()
-
-    st.subheader("Key Metrics")
-    k1, k2, k3 = st.columns(3)
-    k1.metric("Smash Avg", data.get("smash_avg", 0))
-    k2.metric("Carry Avg", data.get("carry_avg", 0))
-    k3.metric("Launch Avg", data.get("launch_avg", 0))
-
-    st.divider()
-
-    with st.expander("Low Point Diagnostics"):
-        st.write(
-            f"Carry CV: {data.get('carry_cv', 0)} | "
-            f"Attack Std: {data.get('attack_std', 0)} | "
-            f"Launch Angle Std: {data.get('launch_angle_std', 0)} | "
-            f"Spin CV: {data.get('spin_cv', 0)}"
-        )
-
-    with st.expander("Sequencing Diagnostics"):
-        st.write(
-            f"Good: {data.get('good_sequence_pct', 0)}% | "
-            f"Borderline: {data.get('borderline_pct', 0)}% | "
-            f"Early Chest: {data.get('early_chest_pct', 0)}%"
-        )
-
-    with st.expander("Drift Diagnostics"):
-        st.write(
-            f"Session Start: {data.get('drift_start_session', 0)} | "
-            f"Last 15 Start: {data.get('drift_start_last15', 0)}"
-        )
-        st.write(
-            f"Session Path: {data.get('drift_path_session', 0)} | "
-            f"Last 15 Path: {data.get('drift_path_last15', 0)}"
-        )
