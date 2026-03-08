@@ -1,16 +1,16 @@
 """
 GolfAI Command Centre
-Version: v1.3
+Version: v2.0
 
 Change Summary:
-- Restores full Command Centre layout
-- Keeps GolfAI Diagnosis summary panel
-- Keeps date-based Trend Dashboard
-- Adds Session Comparison section
-- Keeps CSV upload workflow
-- Restores Blueprint, Session Intelligence,
+- Introduces tabbed Command Centre layout
+- Reduces scrolling
+- Improves stat comparability
+- Keeps Diagnosis summary panel
+- Keeps Practice Plan, Comparison, Trends,
+  Swing Blueprint, Session Intelligence,
   Mechanics Snapshot, Dispersion Intelligence,
-  Key Metrics, and Diagnostics sections
+  Shot Pattern, Key Metrics, Diagnostics
 """
 
 import streamlit as st
@@ -109,7 +109,6 @@ def render_comparison_section():
 
     if not comparison.get("has_comparison", False):
         st.info(comparison.get("message", "Comparison unavailable."))
-        st.divider()
         return
 
     st.caption(
@@ -140,37 +139,8 @@ def render_comparison_section():
         comparison.get("corridor_delta", 0)
     )
 
-    st.divider()
 
-
-def command_centre_page():
-    st.title("GolfAI Command Centre")
-
-    uploaded_file = st.file_uploader(
-        "Upload MLM2PRO CSV",
-        type=["csv"]
-    )
-
-    data = None
-
-    if uploaded_file is not None:
-        data = run_golfai_analysis(uploaded_file=uploaded_file)
-    else:
-        sessions = list_sessions()
-
-        if sessions:
-            selected = st.selectbox(
-                "Select Session",
-                sessions,
-                index=len(sessions) - 1
-            )
-            data = run_golfai_analysis(session_file=selected)
-        else:
-            st.info("Upload an MLM2PRO CSV to begin analysis.")
-            return
-
-    render_summary_panel(data)
-
+def render_practice_plan(data):
     st.subheader("Practice Plan")
 
     plan = data.get("practice_plan", {})
@@ -191,10 +161,8 @@ def command_centre_page():
     t3.metric("Launch Window", plan.get("target_launch_direction", "-"))
     t4.metric("Path Window", plan.get("target_path_window", "-"))
 
-    st.divider()
 
-    render_comparison_section()
-
+def render_trend_dashboard():
     st.subheader("Trend Dashboard")
 
     trend = build_trend_data()
@@ -238,8 +206,8 @@ def command_centre_page():
     else:
         st.info("Trend history will appear after multiple sessions.")
 
-    st.divider()
 
+def render_swing_section(data):
     st.subheader("Swing Blueprint")
 
     b1, b2 = st.columns(2)
@@ -284,8 +252,8 @@ def command_centre_page():
     m3.metric("Sequencing", data.get("sequencing_score", 0))
     m4.metric("Low Point", data.get("lowpoint_score", 0))
 
-    st.divider()
 
+def render_dispersion_section(data):
     st.subheader("Dispersion Intelligence")
 
     d1, d2, d3 = st.columns(3)
@@ -313,9 +281,11 @@ def command_centre_page():
     k2.metric("Carry Avg", data.get("carry_avg", 0))
     k3.metric("Launch Avg", data.get("launch_avg", 0))
 
-    st.divider()
 
-    with st.expander("Low Point Diagnostics"):
+def render_diagnostics_section(data):
+    st.subheader("Diagnostics")
+
+    with st.expander("Low Point Diagnostics", expanded=False):
         st.write(
             f"Carry CV: {data.get('carry_cv', 0)} | "
             f"Attack Std: {data.get('attack_std', 0)} | "
@@ -323,14 +293,14 @@ def command_centre_page():
             f"Spin CV: {data.get('spin_cv', 0)}"
         )
 
-    with st.expander("Sequencing Diagnostics"):
+    with st.expander("Sequencing Diagnostics", expanded=False):
         st.write(
             f"Good: {data.get('good_sequence_pct', 0)}% | "
             f"Borderline: {data.get('borderline_pct', 0)}% | "
             f"Early Chest: {data.get('early_chest_pct', 0)}%"
         )
 
-    with st.expander("Drift Diagnostics"):
+    with st.expander("Drift Diagnostics", expanded=False):
         st.write(
             f"Session Start: {data.get('drift_start_session', 0)} | "
             f"Last 15 Start: {data.get('drift_start_last15', 0)}"
@@ -339,3 +309,53 @@ def command_centre_page():
             f"Session Path: {data.get('drift_path_session', 0)} | "
             f"Last 15 Path: {data.get('drift_path_last15', 0)}"
         )
+
+
+def command_centre_page():
+    st.title("GolfAI Command Centre")
+
+    uploaded_file = st.file_uploader(
+        "Upload MLM2PRO CSV",
+        type=["csv"]
+    )
+
+    data = None
+
+    if uploaded_file is not None:
+        data = run_golfai_analysis(uploaded_file=uploaded_file)
+    else:
+        sessions = list_sessions()
+
+        if sessions:
+            selected = st.selectbox(
+                "Select Session",
+                sessions,
+                index=len(sessions) - 1
+            )
+            data = run_golfai_analysis(session_file=selected)
+        else:
+            st.info("Upload an MLM2PRO CSV to begin analysis.")
+            return
+
+    render_summary_panel(data)
+
+    overview_tab, swing_tab, dispersion_tab, trends_tab, diagnostics_tab = st.tabs(
+        ["Overview", "Swing", "Dispersion", "Trends", "Diagnostics"]
+    )
+
+    with overview_tab:
+        render_practice_plan(data)
+        st.divider()
+        render_comparison_section()
+
+    with swing_tab:
+        render_swing_section(data)
+
+    with dispersion_tab:
+        render_dispersion_section(data)
+
+    with trends_tab:
+        render_trend_dashboard()
+
+    with diagnostics_tab:
+        render_diagnostics_section(data)
