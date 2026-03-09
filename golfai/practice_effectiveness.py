@@ -1,80 +1,99 @@
+
 """
 GolfAI Practice Effectiveness Engine
 Version: v1.0
 
-Purpose:
-Evaluates whether the most recent practice session was effective
-compared with the prior session, and identifies the biggest
-improvement, biggest risk, and next recommendation.
+Purpose
+-------
+Evaluates how effective recent practice sessions have been by
+comparing the most recent session against the previous one.
+
+Outputs:
+- overall_direction
+- best_improvement
+- biggest_risk
+- recommendation
+
+This engine is designed to evolve into a much deeper learning
+system across multiple sessions.
 """
 
-from golfai.session_history import load_history
-
-
-TRACKED_METRICS = {
-    "performance_score": "Performance",
-    "blueprint_match_pct": "Blueprint",
-    "lowpoint_score": "Low Point",
-    "corridor_pct": "Dispersion",
-    "strike_quality": "Strike",
-}
-
-
-def _delta(current, previous, key):
-    return current.get(key, 0) - previous.get(key, 0)
+import pandas as pd
+from golfai.session_history import load_session_history
 
 
 def build_practice_effectiveness():
-    history = load_history()
 
-    if len(history) < 2:
+    history = load_session_history()
+
+    if history is None or len(history) < 2:
         return {
             "has_effectiveness": False,
             "message": "Practice effectiveness appears after at least two sessions."
         }
 
-    previous = history[-2]
-    current = history[-1]
+    history = history.sort_values("session_date")
 
-    deltas = {}
-    for key, label in TRACKED_METRICS.items():
-        deltas[label] = _delta(current, previous, key)
+    latest = history.iloc[-1]
+    previous = history.iloc[-2]
 
-    best_metric = max(deltas, key=deltas.get)
-    worst_metric = min(deltas, key=deltas.get)
+    metrics = {
+        "Performance": "performance_score",
+        "Blueprint": "blueprint_match_pct",
+        "Low Point": "lowpoint_score",
+        "Dispersion": "corridor_pct",
+        "Strike": "strike_quality"
+    }
 
-    overall_change = (
-        deltas["Performance"]
-        + deltas["Blueprint"]
-        + deltas["Low Point"]
-        + deltas["Dispersion"]
-        + deltas["Strike"]
-    )
+    improvements = {}
 
-    if overall_change > 5:
-        overall_direction = "Positive"
-    elif overall_change < -5:
-        overall_direction = "Negative"
+    for name, col in metrics.items():
+        if col in latest and col in previous:
+            delta = latest[col] - previous[col]
+            improvements[name] = delta
+
+    if not improvements:
+        return {
+            "has_effectiveness": False,
+            "message": "Insufficient metric history for effectiveness analysis."
+        }
+
+    best_metric = max(improvements, key=improvements.get)
+    best_delta = improvements[best_metric]
+
+    worst_metric = min(improvements, key=improvements.get)
+    worst_delta = improvements[worst_metric]
+
+    avg_delta = sum(improvements.values()) / len(improvements)
+
+    if avg_delta > 2:
+        direction = "Positive"
+    elif avg_delta < -2:
+        direction = "Negative"
     else:
-        overall_direction = "Neutral"
+        direction = "Neutral"
 
-    if worst_metric == "Low Point":
-        recommendation = "Prioritise low point control next session."
-    elif worst_metric == "Dispersion":
-        recommendation = "Prioritise start line and face control next session."
-    elif worst_metric == "Strike":
-        recommendation = "Prioritise strike quality and centered contact next session."
-    elif worst_metric == "Blueprint":
-        recommendation = "Prioritise blueprint match and movement pattern consistency."
-    else:
-        recommendation = "Stay with current plan but monitor changes closely."
+    recommendation = generate_recommendation(worst_metric)
 
     return {
         "has_effectiveness": True,
-        "overall_direction": overall_direction,
+        "overall_direction": direction,
         "best_improvement": best_metric,
-        "best_delta": round(deltas[best_metric], 1),
+        "best_delta": round(best_delta, 2),
         "biggest_risk": worst_metric,
-        "risk_delta": round(deltas[worst_metric], 1),
-        "recommendation": recommendation,
+        "risk_delta": round(worst_delta, 2),
+        "recommendation": recommendation
     }
+
+
+def generate_recommendation(metric):
+
+    recommendations = {
+        "Dispersion": "Prioritise start line and face control next session.",
+        "Low Point": "Work on strike compression and consistent attack angle.",
+        "Blueprint": "Focus on repeating the target swing blueprint.",
+        "Strike": "Improve contact quality through low point control drills.",
+        "Performance": "Focus on overall swing sequencing and rhythm."
+    }
+
+    return recommendations.get(metric, "Continue structured practice sessions.")
