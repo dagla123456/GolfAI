@@ -1,10 +1,9 @@
 """
 GolfAI Command Centre
-Version: v2.4
+Version: v2.3
 
 Change Summary:
 - Adds Learning Insights section
-- Adds Practice Effectiveness section
 - Improves text contrast across cards/tabs/comparison
 - Keeps professional UI styling
 - Keeps persistent uploaded session handling
@@ -21,7 +20,6 @@ from golfai.engine import run_golfai_analysis
 from golfai.trends import build_trend_data
 from golfai.comparison import compare_latest_sessions
 from golfai.learning_engine import build_learning_insights
-from golfai.practice_effectiveness import build_practice_effectiveness
 
 
 def inject_styles():
@@ -355,47 +353,6 @@ def render_learning_section():
     """, unsafe_allow_html=True)
 
 
-def render_practice_effectiveness():
-    effectiveness = build_practice_effectiveness()
-
-    if not effectiveness.get("has_effectiveness", False):
-        st.markdown(
-            f'<div class="card"><div class="card-title">Practice Effectiveness</div>'
-            f'<div style="color:#1f2430;">{effectiveness.get("message","Practice effectiveness unavailable.")}</div></div>',
-            unsafe_allow_html=True
-        )
-        return
-
-    direction = effectiveness.get("overall_direction", "-")
-    best = effectiveness.get("best_improvement", "-")
-    best_delta = effectiveness.get("best_delta", 0)
-    risk = effectiveness.get("biggest_risk", "-")
-    risk_delta = effectiveness.get("risk_delta", 0)
-    recommendation = effectiveness.get("recommendation", "-")
-
-    st.markdown(f"""
-    <div class="card">
-        <div class="card-title">Practice Effectiveness</div>
-
-        <div style="margin-bottom:0.7rem; color:#1f2430;">
-            <strong>Overall Direction:</strong> {direction}
-        </div>
-
-        <div style="margin-bottom:0.7rem; color:#1f2430;">
-            <strong>Best Improvement:</strong> {best} ({best_delta})
-        </div>
-
-        <div style="margin-bottom:0.7rem; color:#1f2430;">
-            <strong>Biggest Risk:</strong> {risk} ({risk_delta})
-        </div>
-
-        <div style="color:#1f2430;">
-            <strong>Recommendation:</strong> {recommendation}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-
 def render_practice_plan(data):
     plan = data.get("practice_plan", {})
 
@@ -415,7 +372,6 @@ def render_practice_plan(data):
         render_comparison_section()
 
     render_learning_section()
-    render_practice_effectiveness()
 
     st.markdown(f"""
     <div class="metric-bar">
