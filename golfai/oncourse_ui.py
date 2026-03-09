@@ -1,18 +1,21 @@
 """
 GolfAI On Course Mode
-Version: v0.1
+Version: v0.2
 
-Mobile-first cue display.
+Fixes cue image loading for Streamlit Cloud.
 """
 
-import os
+from pathlib import Path
 import streamlit as st
 from golfai.cue_engine import build_oncourse_cues
 
+BASE_DIR = Path(__file__).resolve().parent
+CUE_IMAGE_DIR = BASE_DIR / "cue_images"
+
 
 def oncourse_page():
-    st.markdown("## GOLF AI")
-    st.markdown("### ON COURSE MODE")
+
+    st.title("On Course Mode")
 
     cues = build_oncourse_cues()
 
@@ -22,24 +25,40 @@ def oncourse_page():
 
     st.subheader("Today's Swing Focus")
 
-    primary_image_path = f"/kaggle/working/GolfAI/golfai/cue_images/{cues['primary_image']}"
-    if os.path.exists(primary_image_path):
-        st.image(primary_image_path, use_container_width=True)
+    primary_image = cues.get("primary_image")
+    if primary_image:
 
-    st.markdown(f"### {cues['primary_cue']}")
-    st.caption(cues["primary_desc"])
+        img_path = CUE_IMAGE_DIR / primary_image
 
-    st.divider()
+        if img_path.exists():
+            st.image(str(img_path), use_container_width=True)
 
-    secondary_image_path = f"/kaggle/working/GolfAI/golfai/cue_images/{cues['secondary_image']}"
-    if os.path.exists(secondary_image_path):
-        st.image(secondary_image_path, use_container_width=True)
-
-    st.markdown(f"### {cues['secondary_cue']}")
-    st.caption(cues["secondary_desc"])
+    st.markdown(f"### {cues.get('primary_cue','')}")
+    st.caption(cues.get("primary_desc",""))
 
     st.divider()
 
-    c1, c2 = st.columns(2)
-    c1.metric("Miss Pattern", cues.get("miss_bias", "-"))
-    c2.metric("Last Session", cues.get("momentum", "-"))
+    secondary_image = cues.get("secondary_image")
+    if secondary_image:
+
+        img_path = CUE_IMAGE_DIR / secondary_image
+
+        if img_path.exists():
+            st.image(str(img_path), use_container_width=True)
+
+    st.markdown(f"### {cues.get('secondary_cue','')}")
+    st.caption(cues.get("secondary_desc",""))
+
+    st.divider()
+
+    col1, col2 = st.columns(2)
+
+    col1.metric(
+        "Miss Pattern",
+        cues.get("miss_bias","-")
+    )
+
+    col2.metric(
+        "Session Momentum",
+        cues.get("momentum","-")
+    )
