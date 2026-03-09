@@ -1,12 +1,12 @@
 """
 GolfAI Command Centre
-Version: v2.2
+Version: v2.3
 
 Change Summary:
+- Adds Learning Insights section
+- Improves text contrast across cards/tabs/comparison
 - Keeps professional UI styling
-- Keeps tabbed layout
-- Persists uploaded session across page navigation
-- Fixes uploaded file handling using session_state
+- Keeps persistent uploaded session handling
 """
 
 import streamlit as st
@@ -19,11 +19,16 @@ from golfai.data_loader import list_sessions
 from golfai.engine import run_golfai_analysis
 from golfai.trends import build_trend_data
 from golfai.comparison import compare_latest_sessions
+from golfai.learning_engine import build_learning_insights
 
 
 def inject_styles():
     st.markdown("""
     <style>
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stMainBlockContainer"] {
+        color: #1f2430 !important;
+    }
+
     .main-title {
         background: linear-gradient(90deg, #173f2d, #214d39);
         color: white;
@@ -45,56 +50,52 @@ def inject_styles():
         margin-bottom: 0.7rem;
     }
 
-    .summary-card {
+    .summary-card, .card, .metric-bar {
         background: white;
         border: 1px solid #e7e9ef;
         border-radius: 0.7rem;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        color: #1f2430 !important;
+    }
+
+    .summary-card {
         padding: 1rem 1.1rem;
         min-height: 92px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         margin-bottom: 0.6rem;
     }
 
-    .summary-label {
+    .summary-label, .metric-item-label {
         font-size: 0.95rem;
-        color: #5b6270;
+        color: #5b6270 !important;
         margin-bottom: 0.25rem;
     }
 
-    .summary-value {
-        font-size: 1.6rem;
+    .summary-value, .metric-item-value {
+        font-size: 1.35rem;
         font-weight: 700;
-        color: #1f2430;
+        color: #1f2430 !important;
     }
 
     .summary-value-green {
-        font-size: 1.6rem;
+        font-size: 1.35rem;
         font-weight: 700;
-        color: #167c35;
+        color: #167c35 !important;
     }
 
     .card {
-        background: white;
-        border: 1px solid #e7e9ef;
-        border-radius: 0.7rem;
         padding: 1rem 1.1rem;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         margin-bottom: 1rem;
     }
 
     .card-title {
         font-size: 1.05rem;
         font-weight: 700;
-        color: #1f2430;
+        color: #1f2430 !important;
         margin-bottom: 0.7rem;
     }
 
     .metric-bar {
-        background: white;
-        border: 1px solid #e7e9ef;
-        border-radius: 0.7rem;
         padding: 0.9rem 1rem;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         margin-top: 0.8rem;
         margin-bottom: 1rem;
     }
@@ -109,17 +110,6 @@ def inject_styles():
     .metric-item {
         flex: 1;
         min-width: 140px;
-    }
-
-    .metric-item-label {
-        font-size: 0.9rem;
-        color: #5b6270;
-    }
-
-    .metric-item-value {
-        font-size: 1.35rem;
-        font-weight: 700;
-        color: #1f2430;
     }
 
     .delta-up {
@@ -142,9 +132,25 @@ def inject_styles():
         padding: 0.65rem 1rem !important;
     }
 
+    button[data-baseweb="tab"] p,
+    button[data-baseweb="tab"] span {
+        color: #1f2430 !important;
+        font-weight: 600 !important;
+    }
+
     button[data-baseweb="tab"][aria-selected="true"] {
         background: #1f4a35 !important;
         color: white !important;
+    }
+
+    button[data-baseweb="tab"][aria-selected="true"] p,
+    button[data-baseweb="tab"][aria-selected="true"] span {
+        color: white !important;
+    }
+
+    .stMarkdown, .stMarkdown p, .stCaption, .stMetric, .stMetric label,
+    .stMetric div, label, p, div, span {
+        color: #1f2430;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -229,7 +235,6 @@ def render_shot_pattern_chart(data):
     corridor_m = data.get("corridor_m", 5)
 
     fig, ax = plt.subplots(figsize=(7, 6))
-
     ax.axvspan(-corridor_m, corridor_m, alpha=0.10)
     ax.axvline(0, linewidth=1)
     ax.scatter(df["Side Carry"], df["Carry Distance"])
@@ -255,7 +260,6 @@ def render_shot_pattern_chart(data):
 
 def render_trend_chart(x, y, title, ylabel):
     fig, ax = plt.subplots(figsize=(6.5, 3.8))
-
     ax.plot(x, y, marker="o")
     ax.set_title(title)
     ax.set_xlabel("Session Date")
@@ -264,7 +268,6 @@ def render_trend_chart(x, y, title, ylabel):
 
     plt.xticks(rotation=35, ha="right")
     plt.tight_layout()
-
     st.pyplot(fig)
 
 
@@ -285,7 +288,11 @@ def render_comparison_section():
     comparison = compare_latest_sessions()
 
     if not comparison.get("has_comparison", False):
-        st.markdown('<div class="card"><div class="card-title">Session Comparison</div><div>Comparison will appear after at least two sessions are stored.</div></div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="card"><div class="card-title">Session Comparison</div>'
+            '<div style="color:#1f2430;">Comparison will appear after at least two sessions are stored.</div></div>',
+            unsafe_allow_html=True
+        )
         return
 
     performance_delta = format_delta_html(comparison.get("performance_delta", 0))
@@ -300,11 +307,47 @@ def render_comparison_section():
             Previous: {comparison.get("previous_session", "Previous")} |
             Current: {comparison.get("current_session", "Current")}
         </div>
-        <div style="display:grid; row-gap:0.9rem;">
+        <div style="display:grid; row-gap:0.9rem; color:#1f2430;">
             <div><strong>Performance</strong> &nbsp; {comparison.get("performance_prev", 0)} → {comparison.get("performance_curr", 0)} &nbsp; {performance_delta}</div>
             <div><strong>Blueprint %</strong> &nbsp; {comparison.get("blueprint_prev", 0)} → {comparison.get("blueprint_curr", 0)} &nbsp; {blueprint_delta}</div>
             <div><strong>Low Point</strong> &nbsp; {comparison.get("lowpoint_prev", 0)} → {comparison.get("lowpoint_curr", 0)} &nbsp; {lowpoint_delta}</div>
             <div><strong>Corridor %</strong> &nbsp; {comparison.get("corridor_prev", 0)} → {comparison.get("corridor_curr", 0)} &nbsp; {corridor_delta}</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+def render_learning_section():
+    learning = build_learning_insights()
+
+    if not learning.get("has_learning", False):
+        st.markdown(
+            f'<div class="card"><div class="card-title">Learning Insights</div>'
+            f'<div style="color:#1f2430;">{learning.get("message","Learning insights unavailable.")}</div></div>',
+            unsafe_allow_html=True
+        )
+        return
+
+    trend_to_symbol = {
+        "Improving": "▲",
+        "Stable": "■",
+        "Worsening": "▼"
+    }
+
+    def fmt(label):
+        symbol = trend_to_symbol.get(label, "•")
+        color = "#167c35" if label == "Improving" else "#b42318" if label == "Worsening" else "#5b6270"
+        return f'<span style="color:{color}; font-weight:700;">{symbol} {label}</span>'
+
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">Learning Insights</div>
+        <div style="display:grid; row-gap:0.8rem; color:#1f2430;">
+            <div><strong>Performance</strong> &nbsp; {fmt(learning.get("performance_trend","-"))}</div>
+            <div><strong>Blueprint</strong> &nbsp; {fmt(learning.get("blueprint_trend","-"))}</div>
+            <div><strong>Low Point</strong> &nbsp; {fmt(learning.get("lowpoint_trend","-"))}</div>
+            <div><strong>Dispersion</strong> &nbsp; {fmt(learning.get("dispersion_trend","-"))}</div>
+            <div><strong>Strike</strong> &nbsp; {fmt(learning.get("strike_trend","-"))}</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -319,14 +362,16 @@ def render_practice_plan(data):
         st.markdown(f"""
         <div class="card">
             <div class="card-title">Practice Plan</div>
-            <div style="margin-bottom:0.9rem;"><strong>Priority:</strong> {plan.get("practice_priority", "-")}</div>
-            <div style="margin-bottom:0.9rem;"><strong>Drill:</strong> {plan.get("recommended_drill", "-")}</div>
-            <div><strong>Goal:</strong> {plan.get("session_goal", "-")}</div>
+            <div style="margin-bottom:0.9rem; color:#1f2430;"><strong>Priority:</strong> {plan.get("practice_priority", "-")}</div>
+            <div style="margin-bottom:0.9rem; color:#1f2430;"><strong>Drill:</strong> {plan.get("recommended_drill", "-")}</div>
+            <div style="color:#1f2430;"><strong>Goal:</strong> {plan.get("session_goal", "-")}</div>
         </div>
         """, unsafe_allow_html=True)
 
     with right:
         render_comparison_section()
+
+    render_learning_section()
 
     st.markdown(f"""
     <div class="metric-bar">
@@ -354,23 +399,18 @@ def render_practice_plan(data):
 
 def render_trend_dashboard():
     st.subheader("Trend Dashboard")
-
     trend = build_trend_data()
 
     if trend.get("has_history", False):
         tr1, tr2 = st.columns(2)
-
         with tr1:
             render_trend_chart(trend["dates"], trend["performance"], "Performance Trend", "Score")
-
         with tr2:
             render_trend_chart(trend["dates"], trend["blueprint"], "Blueprint Trend", "%")
 
         tr3, tr4 = st.columns(2)
-
         with tr3:
             render_trend_chart(trend["dates"], trend["lowpoint"], "Low Point Stability Trend", "Score")
-
         with tr4:
             render_trend_chart(trend["dates"], trend["dispersion"], "Dispersion Corridor Trend", "%")
     else:
@@ -392,7 +432,6 @@ def render_swing_section(data):
     )
 
     st.divider()
-
     st.subheader("Session Intelligence")
 
     s1, s2 = st.columns(2)
@@ -409,7 +448,6 @@ def render_swing_section(data):
     )
 
     st.divider()
-
     st.subheader("Mechanics Snapshot")
 
     m1, m2, m3, m4 = st.columns(4)
@@ -434,12 +472,10 @@ def render_dispersion_section(data):
     )
 
     st.divider()
-
     st.subheader("Shot Pattern")
     render_shot_pattern_chart(data)
 
     st.divider()
-
     st.subheader("Key Metrics")
 
     k1, k2, k3 = st.columns(3)
@@ -508,7 +544,6 @@ def command_centre_page():
             st.session_state["latest_upload_bytes"] = None
             st.session_state["latest_upload_name"] = None
             st.rerun()
-
     else:
         sessions = list_sessions()
 
