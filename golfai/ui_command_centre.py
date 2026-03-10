@@ -259,8 +259,11 @@ def render_performance_gauge(score):
     st.pyplot(fig, clear_figure=True)
 
 
+
 def render_shot_pattern_chart(data):
     points = data.get("shot_pattern_points", [])
+
+    st.subheader("Shot Pattern")
 
     if not points:
         st.warning("No shot pattern data available.")
@@ -274,27 +277,61 @@ def render_shot_pattern_chart(data):
     ellipse_height = data.get("ellipse_height", 0)
     corridor_m = data.get("corridor_m", 5)
 
-    fig, ax = plt.subplots(figsize=(7, 6))
-    ax.axvspan(-corridor_m, corridor_m, alpha=0.10)
-    ax.axvline(0, linewidth=1)
-    ax.scatter(df["Side Carry"], df["Carry Distance"])
-    ax.scatter(mean_side, mean_carry, marker="D", s=80)
+    fig, ax = plt.subplots(figsize=(7.6, 6.2))
 
+    # Corridor zone
+    ax.axvspan(-corridor_m, corridor_m, alpha=0.14)
+
+    # Target line
+    ax.axvline(0, linewidth=1.6, linestyle="--")
+
+    # Shot points
+    ax.scatter(
+        df["Side Carry"],
+        df["Carry Distance"],
+        s=52,
+        alpha=0.85
+    )
+
+    # Mean shot marker
+    ax.scatter(
+        mean_side,
+        mean_carry,
+        marker="D",
+        s=110,
+        zorder=5
+    )
+
+    # Dispersion ellipse
     if ellipse_width > 0 and ellipse_height > 0:
         ellipse = Ellipse(
             (mean_side, mean_carry),
             width=ellipse_width * 2,
             height=ellipse_height * 2,
             fill=False,
-            linewidth=2
+            linewidth=2.2
         )
         ax.add_patch(ellipse)
 
-    ax.set_title("Shot Pattern")
+    # Labels and framing
+    ax.set_title("Shot Dispersion Pattern", pad=12)
     ax.set_xlabel("Side Carry (m)")
     ax.set_ylabel("Carry Distance (m)")
-    ax.grid(True, linewidth=0.5)
+    ax.grid(True, linewidth=0.45, alpha=0.6)
 
+    # Better padding around cluster
+    x_pad = max(corridor_m, abs(df["Side Carry"]).max() if len(df) else 5) + 4
+    y_min = max(0, df["Carry Distance"].min() - 8)
+    y_max = df["Carry Distance"].max() + 8
+
+    ax.set_xlim(-x_pad, x_pad)
+    ax.set_ylim(y_min, y_max)
+
+    # Cleaner frame
+    for spine in ["top", "right"]:
+        ax.spines[spine].set_visible(False)
+
+    plt.tight_layout()
     st.pyplot(fig, clear_figure=True)
 
 
