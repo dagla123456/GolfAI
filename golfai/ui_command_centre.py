@@ -1,20 +1,20 @@
 """
 GolfAI Command Centre
-Version: v3.0
+Version: v3.1
 
 Change Summary:
-- Restructures UI into Overview / Focus / Progress / Swing
-- Makes Overview visual-first and coaching-oriented
-- Moves Learning Insights + Trend Dashboard into Progress
-- Moves technical mechanics into Swing
-- Keeps persistent uploaded session handling
-- Keeps text contrast improvements
+- Keeps v3 structure: Overview / Focus / Progress / Swing
+- Adds Performance Gauge to Overview
+- Keeps Practice Effectiveness on Overview
+- Keeps Learning Insights + Trend charts on Progress
+- Keeps technical details on Swing
 """
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import Ellipse
+from matplotlib.patches import Ellipse, Wedge
 from io import BytesIO
 
 from golfai.data_loader import list_sessions
@@ -115,16 +115,6 @@ def inject_styles():
         min-width: 140px;
     }
 
-    .delta-up {
-        color: #167c35;
-        font-weight: 700;
-    }
-
-    .delta-down {
-        color: #b42318;
-        font-weight: 700;
-    }
-
     div[data-baseweb="tab-list"] {
         gap: 0.5rem;
     }
@@ -222,6 +212,53 @@ def render_summary_panel(data):
     st.markdown("<br>", unsafe_allow_html=True)
 
 
+def render_performance_gauge(score):
+    """
+    Visual performance gauge using matplotlib.
+    Score expected: 0-100
+    """
+    score = max(0, min(100, float(score)))
+
+    fig, ax = plt.subplots(figsize=(5.2, 3.4))
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    # Arc zones: Poor / Improving / Good / Excellent
+    zones = [
+        (180, 144, "#d9534f"),  # Poor
+        (144, 108, "#f0ad4e"),  # Improving
+        (108, 72, "#f7d154"),   # Good
+        (72, 36, "#7bc96f"),    # Better
+        (36, 0, "#2e8b57"),     # Excellent
+    ]
+
+    for start, end, color in zones:
+        wedge = Wedge((0, 0), 1.0, end, start, width=0.24, facecolor=color, edgecolor="white")
+        ax.add_patch(wedge)
+
+    # Needle
+    angle = 180 - (score / 100.0) * 180
+    x = 0.78 * np.cos(np.deg2rad(angle))
+    y = 0.78 * np.sin(np.deg2rad(angle))
+    ax.plot([0, x], [0, y], linewidth=3, color="#1f2430")
+    ax.scatter([0], [0], s=90, color="#1f2430", zorder=5)
+
+    # Score text
+    ax.text(0, -0.05, f"{int(round(score))}", ha="center", va="center",
+            fontsize=34, fontweight="bold", color="#243b5a")
+
+    # Labels
+    ax.text(-0.98, -0.32, "Poor", fontsize=10, color="#5b6270", ha="left")
+    ax.text(-0.25, 0.98, "Improving", fontsize=10, color="#5b6270", ha="center")
+    ax.text(0.98, -0.32, "Excellent", fontsize=10, color="#5b6270", ha="right")
+
+    ax.set_xlim(-1.15, 1.15)
+    ax.set_ylim(-0.45, 1.15)
+
+    st.subheader("Performance Gauge")
+    st.pyplot(fig, clear_figure=True)
+
+
 def render_shot_pattern_chart(data):
     points = data.get("shot_pattern_points", [])
 
@@ -258,7 +295,7 @@ def render_shot_pattern_chart(data):
     ax.set_ylabel("Carry Distance (m)")
     ax.grid(True, linewidth=0.5)
 
-    st.pyplot(fig)
+    st.pyplot(fig, clear_figure=True)
 
 
 def render_trend_chart(x, y, title, ylabel):
@@ -270,20 +307,7 @@ def render_trend_chart(x, y, title, ylabel):
     ax.grid(True, linewidth=0.5)
     plt.xticks(rotation=35, ha="right")
     plt.tight_layout()
-    st.pyplot(fig)
-
-
-def format_delta_html(value, suffix=""):
-    try:
-        value_num = float(value)
-    except Exception:
-        value_num = 0
-
-    if value_num > 0:
-        return f'<span class="delta-up">▲ +{value_num}{suffix}</span>'
-    elif value_num < 0:
-        return f'<span class="delta-down">▼ {value_num}{suffix}</span>'
-    return f'<span>0{suffix}</span>'
+    st.pyplot(fig, clear_figure=True)
 
 
 def render_session_comparison():
@@ -394,6 +418,7 @@ def render_practice_effectiveness():
 
 def render_progress_section():
     render_learning_section()
+    render_practice_effectiveness()
 
     st.subheader("Progress Over Time")
 
@@ -542,6 +567,8 @@ def command_centre_page():
     )
 
     with overview_tab:
+        render_performance_gauge(data.get("performance_score", 0))
+        st.divider()
         render_shot_pattern_chart(data)
         st.divider()
         render_session_comparison()
