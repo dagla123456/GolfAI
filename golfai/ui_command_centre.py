@@ -12,7 +12,6 @@ Change Summary:
 
 import streamlit as st
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse, Wedge
 from io import BytesIO
@@ -23,6 +22,7 @@ from golfai.trends import build_trend_data
 from golfai.comparison import compare_latest_sessions
 from golfai.learning_engine import build_learning_insights
 from golfai.practice_effectiveness import build_practice_effectiveness
+from golfai.trend_intelligence import build_trend_intelligence
 
 
 def inject_styles():
@@ -238,8 +238,8 @@ def render_performance_gauge(score):
 
     # Needle
     angle = 180 - (score / 100.0) * 180
-    x = 0.78 * np.cos(np.deg2rad(angle))
-    y = 0.78 * np.sin(np.deg2rad(angle))
+    x = 0.78 * pd.np.cos(pd.np.deg2rad(angle))
+    y = 0.78 * pd.np.sin(pd.np.deg2rad(angle))
     ax.plot([0, x], [0, y], linewidth=3, color="#1f2430")
     ax.scatter([0], [0], s=90, color="#1f2430", zorder=5)
 
@@ -259,11 +259,8 @@ def render_performance_gauge(score):
     st.pyplot(fig, clear_figure=True)
 
 
-
 def render_shot_pattern_chart(data):
     points = data.get("shot_pattern_points", [])
-
-    st.subheader("Shot Pattern")
 
     if not points:
         st.warning("No shot pattern data available.")
@@ -277,61 +274,27 @@ def render_shot_pattern_chart(data):
     ellipse_height = data.get("ellipse_height", 0)
     corridor_m = data.get("corridor_m", 5)
 
-    fig, ax = plt.subplots(figsize=(7.6, 6.2))
+    fig, ax = plt.subplots(figsize=(7, 6))
+    ax.axvspan(-corridor_m, corridor_m, alpha=0.10)
+    ax.axvline(0, linewidth=1)
+    ax.scatter(df["Side Carry"], df["Carry Distance"])
+    ax.scatter(mean_side, mean_carry, marker="D", s=80)
 
-    # Corridor zone
-    ax.axvspan(-corridor_m, corridor_m, alpha=0.14)
-
-    # Target line
-    ax.axvline(0, linewidth=1.6, linestyle="--")
-
-    # Shot points
-    ax.scatter(
-        df["Side Carry"],
-        df["Carry Distance"],
-        s=52,
-        alpha=0.85
-    )
-
-    # Mean shot marker
-    ax.scatter(
-        mean_side,
-        mean_carry,
-        marker="D",
-        s=110,
-        zorder=5
-    )
-
-    # Dispersion ellipse
     if ellipse_width > 0 and ellipse_height > 0:
         ellipse = Ellipse(
             (mean_side, mean_carry),
             width=ellipse_width * 2,
             height=ellipse_height * 2,
             fill=False,
-            linewidth=2.2
+            linewidth=2
         )
         ax.add_patch(ellipse)
 
-    # Labels and framing
-    ax.set_title("Shot Dispersion Pattern", pad=12)
+    ax.set_title("Shot Pattern")
     ax.set_xlabel("Side Carry (m)")
     ax.set_ylabel("Carry Distance (m)")
-    ax.grid(True, linewidth=0.45, alpha=0.6)
+    ax.grid(True, linewidth=0.5)
 
-    # Better padding around cluster
-    x_pad = max(corridor_m, abs(df["Side Carry"]).max() if len(df) else 5) + 4
-    y_min = max(0, df["Carry Distance"].min() - 8)
-    y_max = df["Carry Distance"].max() + 8
-
-    ax.set_xlim(-x_pad, x_pad)
-    ax.set_ylim(y_min, y_max)
-
-    # Cleaner frame
-    for spine in ["top", "right"]:
-        ax.spines[spine].set_visible(False)
-
-    plt.tight_layout()
     st.pyplot(fig, clear_figure=True)
 
 
@@ -452,13 +415,44 @@ def render_practice_effectiveness():
     st.write(recommendation)
     st.divider()
 
+def render_trend_intelligence():
+    st.subheader("Trend Intelligence")
+
+    trend_info = build_trend_intelligence()
+
+    if not trend_info.get("has_trends", False):
+        st.info(trend_info.get("message", "Trend intelligence unavailable."))
+        return
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.metric(
+            "Strongest Gain",
+            trend_info.get("strongest_gain", "-"),
+            trend_info.get("strongest_gain_delta", 0)
+        )
+
+    with c2:
+        st.metric(
+            "Biggest Concern",
+            trend_info.get("biggest_concern", "-"),
+            trend_info.get("biggest_concern_delta", 0)
+        )
+
+    st.write("**Next Priority**")
+    st.write(trend_info.get("next_priority", "-"))
+
+    st.caption(f"Based on last {trend_info.get('lookback_sessions', 0)} sessions")
+    st.divider()
 
 def render_progress_section():
     render_learning_section()
+    render_trend_intelligence()
     render_practice_effectiveness()
 
     st.subheader("Progress Over Time")
-
+    
     trend = build_trend_data()
 
     if trend.get("has_history", False):
