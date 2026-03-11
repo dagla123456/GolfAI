@@ -383,7 +383,9 @@ def render_learning_section():
         st.metric("Dispersion", learning.get("dispersion_trend", "-"))
 
 
+
 def render_practice_effectiveness():
+
     effectiveness = build_practice_effectiveness()
 
     st.subheader("Practice Effectiveness")
@@ -398,22 +400,26 @@ def render_practice_effectiveness():
     direction = effectiveness.get("overall_direction", "-")
     best = effectiveness.get("best_improvement", "-")
     best_delta = effectiveness.get("best_delta", 0)
+
     risk = effectiveness.get("biggest_risk", "-")
     risk_delta = effectiveness.get("risk_delta", 0)
+
     recommendation = effectiveness.get("recommendation", "-")
 
-    c1, c2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-    with c1:
+    with col1:
         st.metric("Overall Direction", direction)
         st.metric("Best Improvement", best, best_delta)
 
-    with c2:
+    with col2:
         st.metric("Biggest Risk", risk, risk_delta)
 
     st.write("**Recommendation**")
     st.write(recommendation)
+
     st.divider()
+
 
 def render_trend_intelligence():
     st.subheader("Trend Intelligence")
