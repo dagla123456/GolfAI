@@ -1,14 +1,12 @@
 """
 GolfAI Command Centre
-Version: v3.0
+Version: v2.3
 
 Change Summary:
-- Restructures UI into Overview / Focus / Progress / Swing
-- Makes Overview visual-first and coaching-oriented
-- Moves Learning Insights + Trend Dashboard into Progress
-- Moves technical mechanics into Swing
+- Adds Learning Insights section
+- Improves text contrast across cards/tabs/comparison
+- Keeps professional UI styling
 - Keeps persistent uploaded session handling
-- Keeps text contrast improvements
 """
 
 import streamlit as st
@@ -22,7 +20,6 @@ from golfai.engine import run_golfai_analysis
 from golfai.trends import build_trend_data
 from golfai.comparison import compare_latest_sessions
 from golfai.learning_engine import build_learning_insights
-from golfai.practice_effectiveness import build_practice_effectiveness
 
 
 def inject_styles():
@@ -37,7 +34,7 @@ def inject_styles():
         color: white;
         padding: 1.1rem 1.4rem;
         border-radius: 0.8rem;
-        font-size: 2.1rem;
+        font-size: 2.2rem;
         font-weight: 700;
         letter-spacing: 0.02em;
         margin-bottom: 1rem;
@@ -172,7 +169,7 @@ def render_summary_panel(data):
     with row1[0]:
         st.markdown(f"""
         <div class="summary-card">
-            <div class="summary-label">Session Score</div>
+            <div class="summary-label">Performance</div>
             <div class="summary-value">{data.get("performance_score", 0)}</div>
         </div>
         """, unsafe_allow_html=True)
@@ -180,7 +177,7 @@ def render_summary_panel(data):
     with row1[1]:
         st.markdown(f"""
         <div class="summary-card">
-            <div class="summary-label">Biggest Risk</div>
+            <div class="summary-label">Primary Issue</div>
             <div class="summary-value">{data.get("primary_issue", "-")}</div>
         </div>
         """, unsafe_allow_html=True)
@@ -190,7 +187,7 @@ def render_summary_panel(data):
         momentum_class = "summary-value-green" if "Improving" in str(momentum) or "↑" in str(momentum) else "summary-value"
         st.markdown(f"""
         <div class="summary-card">
-            <div class="summary-label">Swing Direction</div>
+            <div class="summary-label">Momentum</div>
             <div class="{momentum_class}">{momentum}</div>
         </div>
         """, unsafe_allow_html=True)
@@ -206,16 +203,16 @@ def render_summary_panel(data):
     with row2[1]:
         st.markdown(f"""
         <div class="summary-card">
-            <div class="summary-label">Best Area</div>
-            <div class="summary-value-green">{data.get("practice_plan", {}).get("practice_priority", "-")}</div>
+            <div class="summary-label">Blueprint %</div>
+            <div class="summary-value-green">{data.get("blueprint_match_pct", 0)}%</div>
         </div>
         """, unsafe_allow_html=True)
 
     with row2[2]:
         st.markdown(f"""
         <div class="summary-card">
-            <div class="summary-label">Blueprint %</div>
-            <div class="summary-value-green">{data.get("blueprint_match_pct", 0)}%</div>
+            <div class="summary-label">Corridor %</div>
+            <div class="summary-value-green">{data.get("corridor_pct", 0)}%</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -253,7 +250,7 @@ def render_shot_pattern_chart(data):
         )
         ax.add_patch(ellipse)
 
-    ax.set_title("Shot Pattern")
+    ax.set_title("Shot Pattern Visualization")
     ax.set_xlabel("Side Carry (m)")
     ax.set_ylabel("Carry Distance (m)")
     ax.grid(True, linewidth=0.5)
@@ -268,6 +265,7 @@ def render_trend_chart(x, y, title, ylabel):
     ax.set_xlabel("Session Date")
     ax.set_ylabel(ylabel)
     ax.grid(True, linewidth=0.5)
+
     plt.xticks(rotation=35, ha="right")
     plt.tight_layout()
     st.pyplot(fig)
@@ -286,137 +284,135 @@ def format_delta_html(value, suffix=""):
     return f'<span>0{suffix}</span>'
 
 
-def render_session_comparison():
+def render_comparison_section():
     comparison = compare_latest_sessions()
 
-    st.subheader("Session vs Previous")
-
     if not comparison.get("has_comparison", False):
-        st.info("Comparison will appear after at least two sessions are stored.")
+        st.markdown(
+            '<div class="card"><div class="card-title">Session Comparison</div>'
+            '<div style="color:#1f2430;">Comparison will appear after at least two sessions are stored.</div></div>',
+            unsafe_allow_html=True
+        )
         return
 
-    c1, c2, c3 = st.columns(3)
+    performance_delta = format_delta_html(comparison.get("performance_delta", 0))
+    blueprint_delta = format_delta_html(comparison.get("blueprint_delta", 0), "%")
+    lowpoint_delta = format_delta_html(comparison.get("lowpoint_delta", 0))
+    corridor_delta = format_delta_html(comparison.get("corridor_delta", 0), "%")
 
-    with c1:
-        st.metric(
-            "Strike",
-            comparison.get("performance_curr", 0),
-            comparison.get("performance_delta", 0)
-        )
-
-    with c2:
-        st.metric(
-            "Blueprint",
-            comparison.get("blueprint_curr", 0),
-            comparison.get("blueprint_delta", 0)
-        )
-
-    with c3:
-        st.metric(
-            "Dispersion",
-            comparison.get("corridor_curr", 0),
-            comparison.get("corridor_delta", 0)
-        )
-
-
-def render_focus_section(data):
-    st.subheader("Today's Focus")
-
-    plan = data.get("practice_plan", {})
-
-    c1, c2 = st.columns(2)
-
-    with c1:
-        st.metric("Primary Focus", plan.get("practice_priority", "-"))
-        st.metric("Recommended Drill", plan.get("recommended_drill", "-"))
-
-    with c2:
-        secondary = data.get("secondary_issue", "-")
-        st.metric("Secondary Focus", secondary)
-        st.info(plan.get("session_goal", "-"))
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">Session Comparison</div>
+        <div style="margin-bottom:0.7rem; color:#5b6270;">
+            Previous: {comparison.get("previous_session", "Previous")} |
+            Current: {comparison.get("current_session", "Current")}
+        </div>
+        <div style="display:grid; row-gap:0.9rem; color:#1f2430;">
+            <div><strong>Performance</strong> &nbsp; {comparison.get("performance_prev", 0)} → {comparison.get("performance_curr", 0)} &nbsp; {performance_delta}</div>
+            <div><strong>Blueprint %</strong> &nbsp; {comparison.get("blueprint_prev", 0)} → {comparison.get("blueprint_curr", 0)} &nbsp; {blueprint_delta}</div>
+            <div><strong>Low Point</strong> &nbsp; {comparison.get("lowpoint_prev", 0)} → {comparison.get("lowpoint_curr", 0)} &nbsp; {lowpoint_delta}</div>
+            <div><strong>Corridor %</strong> &nbsp; {comparison.get("corridor_prev", 0)} → {comparison.get("corridor_curr", 0)} &nbsp; {corridor_delta}</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 def render_learning_section():
-    st.subheader("Learning Insights")
-
     learning = build_learning_insights()
 
     if not learning.get("has_learning", False):
-        st.info(learning.get("message", "Learning insights unavailable."))
+        st.markdown(
+            f'<div class="card"><div class="card-title">Learning Insights</div>'
+            f'<div style="color:#1f2430;">{learning.get("message","Learning insights unavailable.")}</div></div>',
+            unsafe_allow_html=True
+        )
         return
 
-    c1, c2, c3 = st.columns(3)
+    trend_to_symbol = {
+        "Improving": "▲",
+        "Stable": "■",
+        "Worsening": "▼"
+    }
 
-    with c1:
-        st.metric("Performance", learning.get("performance_trend", "-"))
-        st.metric("Strike", learning.get("strike_trend", "-"))
+    def fmt(label):
+        symbol = trend_to_symbol.get(label, "•")
+        color = "#167c35" if label == "Improving" else "#b42318" if label == "Worsening" else "#5b6270"
+        return f'<span style="color:{color}; font-weight:700;">{symbol} {label}</span>'
 
-    with c2:
-        st.metric("Blueprint", learning.get("blueprint_trend", "-"))
-        st.metric("Low Point", learning.get("lowpoint_trend", "-"))
-
-    with c3:
-        st.metric("Dispersion", learning.get("dispersion_trend", "-"))
-
-
-def render_practice_effectiveness():
-    effectiveness = build_practice_effectiveness()
-
-    st.subheader("Practice Effectiveness")
-
-    if not effectiveness.get("has_effectiveness", False):
-        st.info(effectiveness.get(
-            "message",
-            "Practice effectiveness appears after at least two sessions."
-        ))
-        return
-
-    direction = effectiveness.get("overall_direction", "-")
-    best = effectiveness.get("best_improvement", "-")
-    best_delta = effectiveness.get("best_delta", 0)
-    risk = effectiveness.get("biggest_risk", "-")
-    risk_delta = effectiveness.get("risk_delta", 0)
-    recommendation = effectiveness.get("recommendation", "-")
-
-    c1, c2 = st.columns(2)
-
-    with c1:
-        st.metric("Overall Direction", direction)
-        st.metric("Best Improvement", best, best_delta)
-
-    with c2:
-        st.metric("Biggest Risk", risk, risk_delta)
-
-    st.write("**Recommendation**")
-    st.write(recommendation)
-    st.divider()
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">Learning Insights</div>
+        <div style="display:grid; row-gap:0.8rem; color:#1f2430;">
+            <div><strong>Performance</strong> &nbsp; {fmt(learning.get("performance_trend","-"))}</div>
+            <div><strong>Blueprint</strong> &nbsp; {fmt(learning.get("blueprint_trend","-"))}</div>
+            <div><strong>Low Point</strong> &nbsp; {fmt(learning.get("lowpoint_trend","-"))}</div>
+            <div><strong>Dispersion</strong> &nbsp; {fmt(learning.get("dispersion_trend","-"))}</div>
+            <div><strong>Strike</strong> &nbsp; {fmt(learning.get("strike_trend","-"))}</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 
-def render_progress_section():
+def render_practice_plan(data):
+    plan = data.get("practice_plan", {})
+
+    left, right = st.columns(2)
+
+    with left:
+        st.markdown(f"""
+        <div class="card">
+            <div class="card-title">Practice Plan</div>
+            <div style="margin-bottom:0.9rem; color:#1f2430;"><strong>Priority:</strong> {plan.get("practice_priority", "-")}</div>
+            <div style="margin-bottom:0.9rem; color:#1f2430;"><strong>Drill:</strong> {plan.get("recommended_drill", "-")}</div>
+            <div style="color:#1f2430;"><strong>Goal:</strong> {plan.get("session_goal", "-")}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with right:
+        render_comparison_section()
+
     render_learning_section()
 
-    st.subheader("Progress Over Time")
+    st.markdown(f"""
+    <div class="metric-bar">
+        <div class="metric-row">
+            <div class="metric-item">
+                <div class="metric-item-label">Target Smash</div>
+                <div class="metric-item-value">{plan.get("target_smash", "-")}</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-item-label">Attack Window</div>
+                <div class="metric-item-value">{plan.get("target_attack_window", "-")}</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-item-label">Launch Window</div>
+                <div class="metric-item-value">{plan.get("target_launch_direction", "-")}</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-item-label">Path Window</div>
+                <div class="metric-item-value">{plan.get("target_path_window", "-")}</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
+
+def render_trend_dashboard():
+    st.subheader("Trend Dashboard")
     trend = build_trend_data()
 
     if trend.get("has_history", False):
-        c1, c2 = st.columns(2)
+        tr1, tr2 = st.columns(2)
+        with tr1:
+            render_trend_chart(trend["dates"], trend["performance"], "Performance Trend", "Score")
+        with tr2:
+            render_trend_chart(trend["dates"], trend["blueprint"], "Blueprint Trend", "%")
 
-        with c1:
-            render_trend_chart(
-                trend["dates"],
-                trend["performance"],
-                "Performance Trend",
-                "Score"
-            )
-
-        with c2:
-            render_trend_chart(
-                trend["dates"],
-                trend["dispersion"],
-                "Dispersion Trend",
-                "%"
-            )
+        tr3, tr4 = st.columns(2)
+        with tr3:
+            render_trend_chart(trend["dates"], trend["lowpoint"], "Low Point Stability Trend", "Score")
+        with tr4:
+            render_trend_chart(trend["dates"], trend["dispersion"], "Dispersion Corridor Trend", "%")
     else:
         st.info("Trend history will appear after multiple sessions.")
 
@@ -424,12 +420,9 @@ def render_progress_section():
 def render_swing_section(data):
     st.subheader("Swing Blueprint")
 
-    c1, c2 = st.columns(2)
-    c1.metric(
-        "Blueprint Matches",
-        f"{data.get('blueprint_matches', 0)} / {data.get('blueprint_total', 0)}"
-    )
-    c2.metric("Match %", f"{data.get('blueprint_match_pct', 0)}%")
+    b1, b2 = st.columns(2)
+    b1.metric("Blueprint Matches", f"{data.get('blueprint_matches', 0)} / {data.get('blueprint_total', 0)}")
+    b2.metric("Match %", f"{data.get('blueprint_match_pct', 0)}%")
 
     st.write(
         f"Target Pattern → Smash {data.get('bp_smash_target', 0)} | "
@@ -439,7 +432,23 @@ def render_swing_section(data):
     )
 
     st.divider()
-    st.subheader("Mechanics")
+    st.subheader("Session Intelligence")
+
+    s1, s2 = st.columns(2)
+    s1.metric("Momentum", data.get("momentum_label", "-"), f"{data.get('momentum_delta', 0)}")
+
+    if data.get("drift_detected", False):
+        s2.error("⚠️ Swing Drift Detected")
+    else:
+        s2.success("Swing Stable")
+
+    st.write(
+        f"Start Drift: {data.get('drift_start_delta', 0)}° | "
+        f"Path Drift: {data.get('drift_path_delta', 0)}°"
+    )
+
+    st.divider()
+    st.subheader("Mechanics Snapshot")
 
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("Strike", data.get("strike_quality", 0))
@@ -447,8 +456,9 @@ def render_swing_section(data):
     m3.metric("Sequencing", data.get("sequencing_score", 0))
     m4.metric("Low Point", data.get("lowpoint_score", 0))
 
-    st.divider()
-    st.subheader("Dispersion")
+
+def render_dispersion_section(data):
+    st.subheader("Dispersion Intelligence")
 
     d1, d2, d3 = st.columns(3)
     d1.metric("Miss Bias", data.get("miss_bias", "-"))
@@ -462,6 +472,19 @@ def render_swing_section(data):
     )
 
     st.divider()
+    st.subheader("Shot Pattern")
+    render_shot_pattern_chart(data)
+
+    st.divider()
+    st.subheader("Key Metrics")
+
+    k1, k2, k3 = st.columns(3)
+    k1.metric("Smash Avg", data.get("smash_avg", 0))
+    k2.metric("Carry Avg", data.get("carry_avg", 0))
+    k3.metric("Launch Avg", data.get("launch_avg", 0))
+
+
+def render_diagnostics_section(data):
     st.subheader("Diagnostics")
 
     with st.expander("Low Point Diagnostics", expanded=False):
@@ -537,22 +560,21 @@ def command_centre_page():
 
     render_summary_panel(data)
 
-    overview_tab, focus_tab, progress_tab, swing_tab = st.tabs(
-        ["Overview", "Focus", "Progress", "Swing"]
+    overview_tab, swing_tab, dispersion_tab, trends_tab, diagnostics_tab = st.tabs(
+        ["Overview", "Swing", "Dispersion", "Trends", "Diagnostics"]
     )
 
     with overview_tab:
-        render_shot_pattern_chart(data)
-        st.divider()
-        render_session_comparison()
-        st.divider()
-        render_practice_effectiveness()
-
-    with focus_tab:
-        render_focus_section(data)
-
-    with progress_tab:
-        render_progress_section()
+        render_practice_plan(data)
 
     with swing_tab:
         render_swing_section(data)
+
+    with dispersion_tab:
+        render_dispersion_section(data)
+
+    with trends_tab:
+        render_trend_dashboard()
+
+    with diagnostics_tab:
+        render_diagnostics_section(data)
