@@ -246,7 +246,7 @@ def render_distance_intelligence(data):
 
     st.write("**Recommendation**")
     st.write(distance_info.get("recommendation", "-"))
-    st.divider()
+    render_distance_range_chart(distance_info)
 
 
 def render_trend_chart(x, y, title, ylabel):
