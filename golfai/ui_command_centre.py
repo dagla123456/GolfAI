@@ -12,6 +12,7 @@ Change Summary:
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse, Wedge
 from io import BytesIO
@@ -238,8 +239,8 @@ def render_performance_gauge(score):
 
     # Needle
     angle = 180 - (score / 100.0) * 180
-    x = 0.78 * pd.np.cos(pd.np.deg2rad(angle))
-    y = 0.78 * pd.np.sin(pd.np.deg2rad(angle))
+    x = 0.78 * np.cos(np.deg2rad(angle))
+    y = 0.78 * np.sin(np.deg2rad(angle))
     ax.plot([0, x], [0, y], linewidth=3, color="#1f2430")
     ax.scatter([0], [0], s=90, color="#1f2430", zorder=5)
 
