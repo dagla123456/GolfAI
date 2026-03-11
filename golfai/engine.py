@@ -68,6 +68,7 @@ def run_golfai_analysis(session_file=None, uploaded_file=None):
     if shots == 0:
         return {
             "session_file": session_label,
+        "df": df,
             "shots_analysed": 0,
             "performance_score": 0,
             "primary_issue": "No 7-iron shots found",
@@ -151,6 +152,7 @@ def run_golfai_analysis(session_file=None, uploaded_file=None):
     # -----------------------------------
     result = {
         "session_file": session_label,
+        "df": df,
         "shots_analysed": shots,
         **scoring_results,
         "practice_focus": [
