@@ -261,6 +261,46 @@ def render_trend_chart(x, y, title, ylabel):
     st.pyplot(fig, clear_figure=True)
 
 
+
+def render_distance_range_chart(distance_info):
+    if not distance_info.get("has_distance_intel", False):
+        return
+
+    full_min = float(distance_info.get("full_min", 0))
+    full_max = float(distance_info.get("full_max", 0))
+    reliable_min = float(distance_info.get("reliable_min", 0))
+    reliable_max = float(distance_info.get("reliable_max", 0))
+    avg_carry = float(distance_info.get("avg_carry", 0))
+
+    if full_max <= full_min:
+        return
+
+    fig, ax = plt.subplots(figsize=(8, 1.8))
+    ax.set_xlim(full_min - 3, full_max + 3)
+    ax.set_ylim(0, 1)
+    ax.axis("off")
+
+    # Full range line
+    ax.hlines(y=0.5, xmin=full_min, xmax=full_max, linewidth=6, alpha=0.35)
+
+    # Reliable range band
+    ax.hlines(y=0.5, xmin=reliable_min, xmax=reliable_max, linewidth=12, alpha=0.9)
+
+    # Average carry marker
+    ax.plot(avg_carry, 0.5, marker="o", markersize=10)
+
+    # Labels
+    ax.text(full_min, 0.18, f"{full_min:.0f}", ha="center", va="center", fontsize=10)
+    ax.text(full_max, 0.18, f"{full_max:.0f}", ha="center", va="center", fontsize=10)
+    ax.text(avg_carry, 0.82, f"Avg {avg_carry:.1f} m", ha="center", va="center", fontsize=10)
+    ax.text((reliable_min + reliable_max) / 2, 0.18,
+            f"Reliable {reliable_min:.1f}–{reliable_max:.1f} m",
+            ha="center", va="center", fontsize=10)
+
+    st.subheader("Distance Range")
+    st.pyplot(fig, clear_figure=True)
+    st.divider()
+
 def render_progress_section():
     render_learning_section()
     render_practice_effectiveness()
