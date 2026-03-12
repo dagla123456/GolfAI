@@ -25,6 +25,7 @@ from golfai.comparison import compare_latest_sessions
 from golfai.learning_engine import build_learning_insights
 from golfai.practice_effectiveness import build_practice_effectiveness
 from golfai.distance_engine import build_distance_intelligence
+from golfai.v4_charts import build_v4_dispersion_chart, build_v4_distance_chart, build_v4_progress_chart
 from golfai.distance_chart import render_distance_range_chart
 from golfai.dispersion_chart import render_professional_dispersion_chart
 
@@ -231,6 +232,10 @@ def render_distance_intelligence_card(data):
     st.write("**Recommendation**")
     st.write(distance_info.get("recommendation", "-"))
 
+    fig = build_v4_distance_chart(distance_info)
+    if fig is not None:
+        st.plotly_chart(fig, use_container_width=True)
+
     fig = render_distance_range_chart(distance_info)
     if fig is not None:
         st.pyplot(fig, clear_figure=True)
@@ -285,14 +290,11 @@ def render_progress_section():
     st.subheader("Progress Over Time")
 
     trend = build_trend_data()
-    if trend.get("has_history", False):
-        c1, c2 = st.columns(2)
-        with c1:
-            render_trend_chart(trend["dates"], trend["performance"], "Performance Trend", "Score")
-        with c2:
-            render_trend_chart(trend["dates"], trend["dispersion"], "Dispersion Trend", "%")
-    else:
+    fig = build_v4_progress_chart(trend)
+    if fig is None:
         st.info("Trend history will appear after multiple sessions.")
+    else:
+        st.plotly_chart(fig, use_container_width=True)
 
 
 def render_swing_section(data):
