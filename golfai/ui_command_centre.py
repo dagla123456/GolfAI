@@ -25,6 +25,7 @@ from golfai.comparison import compare_latest_sessions
 from golfai.learning_engine import build_learning_insights
 from golfai.practice_effectiveness import build_practice_effectiveness
 from golfai.distance_engine import build_distance_intelligence
+from golfai.distance_chart import render_distance_range_chart
 
 
 def inject_styles():
@@ -264,6 +265,10 @@ def render_distance_intelligence_card(data):
 
     st.write("**Recommendation**")
     st.write(distance_info.get("recommendation", "-"))
+
+    fig = render_distance_range_chart(distance_info)
+    if fig is not None:
+        st.pyplot(fig, clear_figure=True)
 
 
 def render_focus_section(data):
