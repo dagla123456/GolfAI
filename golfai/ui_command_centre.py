@@ -1,6 +1,14 @@
 """
 GolfAI Command Centre
-Version: v3.2
+Version: v3.3
+
+UX Uplift Pack v1
+- Keeps current analytics stable
+- Restores v3 structure: Overview / Focus / Progress / Swing
+- Upgrades Overview to 2x2 dashboard grid
+- Keeps Performance Gauge, Distance Intelligence, Shot Pattern,
+  Session Comparison, and Practice Effectiveness
+- Improves hierarchy and readability
 """
 
 import streamlit as st
@@ -25,20 +33,57 @@ def inject_styles():
     html, body, [data-testid="stAppViewContainer"], [data-testid="stMainBlockContainer"] {
         color: #1f2430 !important;
     }
+
     .main-title {
         background: linear-gradient(90deg, #173f2d, #214d39);
         color: white;
-        padding: 1.1rem 1.4rem;
-        border-radius: 0.8rem;
-        font-size: 2.0rem;
+        padding: 1rem 1.25rem;
+        border-radius: 0.9rem;
+        font-size: 2rem;
         font-weight: 700;
         margin-bottom: 1rem;
     }
+
+    .dashboard-card {
+        background: white;
+        border: 1px solid #e6e9ef;
+        border-radius: 0.9rem;
+        padding: 1rem 1rem 0.8rem 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        margin-bottom: 0.8rem;
+    }
+
+    .section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1f2430 !important;
+        margin-bottom: 0.6rem;
+    }
+
+    .summary-strip {
+        background: #f5f7fa;
+        border: 1px solid #e6e9ef;
+        border-radius: 0.8rem;
+        padding: 0.75rem 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    button[data-baseweb="tab"] {
+        background: #eceef3 !important;
+        border-radius: 0.7rem 0.7rem 0 0 !important;
+        padding: 0.65rem 1rem !important;
+    }
+
     button[data-baseweb="tab"] p,
     button[data-baseweb="tab"] span {
         color: #1f2430 !important;
         font-weight: 600 !important;
     }
+
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background: #1f4a35 !important;
+    }
+
     button[data-baseweb="tab"][aria-selected="true"] p,
     button[data-baseweb="tab"][aria-selected="true"] span {
         color: white !important;
@@ -64,7 +109,7 @@ def render_summary_panel(data):
 def render_performance_gauge(score):
     score = max(0, min(100, float(score)))
 
-    fig, ax = plt.subplots(figsize=(5.2, 3.4))
+    fig, ax = plt.subplots(figsize=(5.0, 3.1))
     ax.set_aspect("equal")
     ax.axis("off")
 
@@ -77,7 +122,8 @@ def render_performance_gauge(score):
     ]
 
     for start, end, color in zones:
-        wedge = Wedge((0, 0), 1.0, end, start, width=0.24, facecolor=color, edgecolor="white")
+        wedge = Wedge((0, 0), 1.0, end, start, width=0.24,
+                      facecolor=color, edgecolor="white")
         ax.add_patch(wedge)
 
     angle = 180 - (score / 100.0) * 180
@@ -87,25 +133,26 @@ def render_performance_gauge(score):
     ax.scatter([0], [0], s=90, color="#1f2430", zorder=5)
 
     ax.text(0, -0.05, f"{int(round(score))}", ha="center", va="center",
-            fontsize=34, fontweight="bold", color="#243b5a")
+            fontsize=30, fontweight="bold", color="#243b5a")
 
-    ax.text(-0.98, -0.32, "Poor", fontsize=10, color="#5b6270", ha="left")
-    ax.text(-0.25, 0.98, "Improving", fontsize=10, color="#5b6270", ha="center")
-    ax.text(0.98, -0.32, "Excellent", fontsize=10, color="#5b6270", ha="right")
+    ax.text(-0.95, -0.28, "Poor", fontsize=10, color="#5b6270", ha="left")
+    ax.text(-0.15, 0.95, "Improving", fontsize=10, color="#5b6270", ha="center")
+    ax.text(0.95, -0.28, "Excellent", fontsize=10, color="#5b6270", ha="right")
 
-    ax.set_xlim(-1.15, 1.15)
-    ax.set_ylim(-0.45, 1.15)
+    ax.set_xlim(-1.1, 1.1)
+    ax.set_ylim(-0.42, 1.08)
 
-    st.subheader("Performance Gauge")
+    st.markdown('<div class="section-title">Performance Gauge</div>', unsafe_allow_html=True)
     st.pyplot(fig, clear_figure=True)
 
 
 def render_shot_pattern_chart(data):
     points = data.get("shot_pattern_points", [])
-    st.subheader("Shot Pattern")
+
+    st.markdown('<div class="section-title">Shot Pattern</div>', unsafe_allow_html=True)
 
     if not points:
-        st.warning("No shot pattern data available.")
+        st.info("No shot pattern data available.")
         return
 
     df = pd.DataFrame(points, columns=["Side Carry", "Carry Distance"])
@@ -115,18 +162,20 @@ def render_shot_pattern_chart(data):
     ellipse_height = data.get("ellipse_height", 0)
     corridor_m = data.get("corridor_m", 5)
 
-    fig, ax = plt.subplots(figsize=(7.6, 6.2))
+    fig, ax = plt.subplots(figsize=(6.6, 5.4))
     ax.axvspan(-corridor_m, corridor_m, alpha=0.14)
     ax.axvline(0, linewidth=1.6, linestyle="--")
-    ax.scatter(df["Side Carry"], df["Carry Distance"], s=52, alpha=0.85)
-    ax.scatter(mean_side, mean_carry, marker="D", s=110, zorder=5)
+    ax.scatter(df["Side Carry"], df["Carry Distance"], s=46, alpha=0.85)
+    ax.scatter(mean_side, mean_carry, marker="D", s=90, zorder=5)
 
     if ellipse_width > 0 and ellipse_height > 0:
-        ellipse = Ellipse((mean_side, mean_carry), width=ellipse_width * 2, height=ellipse_height * 2,
-                          fill=False, linewidth=2.2)
+        ellipse = Ellipse((mean_side, mean_carry),
+                          width=ellipse_width * 2,
+                          height=ellipse_height * 2,
+                          fill=False, linewidth=2.0)
         ax.add_patch(ellipse)
 
-    ax.set_title("Shot Dispersion Pattern", pad=12)
+    ax.set_title("Shot Dispersion Pattern", pad=10)
     ax.set_xlabel("Side Carry (m)")
     ax.set_ylabel("Carry Distance (m)")
     ax.grid(True, linewidth=0.45, alpha=0.6)
@@ -144,9 +193,10 @@ def render_shot_pattern_chart(data):
     st.pyplot(fig, clear_figure=True)
 
 
-def render_session_comparison():
+def render_session_comparison_card():
     comparison = compare_latest_sessions()
-    st.subheader("Session vs Previous")
+
+    st.markdown('<div class="section-title">Session Comparison</div>', unsafe_allow_html=True)
 
     if not comparison.get("has_comparison", False):
         st.info("Comparison will appear after at least two sessions are stored.")
@@ -154,11 +204,66 @@ def render_session_comparison():
 
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.metric("Strike", comparison.get("performance_curr", 0), comparison.get("performance_delta", 0))
+        st.metric("Strike", comparison.get("performance_curr", 0),
+                  comparison.get("performance_delta", 0))
     with c2:
-        st.metric("Blueprint", comparison.get("blueprint_curr", 0), comparison.get("blueprint_delta", 0))
+        st.metric("Blueprint", comparison.get("blueprint_curr", 0),
+                  comparison.get("blueprint_delta", 0))
     with c3:
-        st.metric("Dispersion", comparison.get("corridor_curr", 0), comparison.get("corridor_delta", 0))
+        st.metric("Dispersion", comparison.get("corridor_curr", 0),
+                  comparison.get("corridor_delta", 0))
+
+
+def render_practice_effectiveness_card():
+    effectiveness = build_practice_effectiveness()
+
+    st.markdown('<div class="section-title">Practice Effectiveness</div>', unsafe_allow_html=True)
+
+    if not effectiveness.get("has_effectiveness", False):
+        st.info(effectiveness.get("message", "Practice effectiveness unavailable."))
+        return
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.metric("Overall Direction", effectiveness.get("overall_direction", "-"))
+        st.metric("Best Improvement",
+                  effectiveness.get("best_improvement", "-"),
+                  effectiveness.get("best_delta", 0))
+    with c2:
+        st.metric("Biggest Risk",
+                  effectiveness.get("biggest_risk", "-"),
+                  effectiveness.get("risk_delta", 0))
+
+    st.write("**Recommendation**")
+    st.write(effectiveness.get("recommendation", "-"))
+
+
+def render_distance_intelligence_card(data):
+    st.markdown('<div class="section-title">Distance Intelligence</div>', unsafe_allow_html=True)
+
+    distance_info = build_distance_intelligence(
+        data.get("df"),
+        club_label=data.get("club_label", "7i")
+    )
+
+    if not distance_info.get("has_distance_intel", False):
+        st.info("Distance intelligence unavailable.")
+        return
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.metric("Club", distance_info.get("club", "-"))
+        st.metric("Average Carry", f'{distance_info.get("avg_carry", 0)} m')
+        st.metric("Confidence", distance_info.get("confidence", "-"))
+    with c2:
+        st.metric("Reliable Range",
+                  f'{distance_info.get("reliable_min", 0)}–{distance_info.get("reliable_max", 0)} m')
+        st.metric("Full Range",
+                  f'{distance_info.get("full_min", 0)}–{distance_info.get("full_max", 0)} m')
+        st.metric("Spread", f'{distance_info.get("distance_spread", 0)} m')
+
+    st.write("**Recommendation**")
+    st.write(distance_info.get("recommendation", "-"))
 
 
 def render_focus_section(data):
@@ -193,56 +298,8 @@ def render_learning_section():
         st.metric("Dispersion", learning.get("dispersion_trend", "-"))
 
 
-def render_practice_effectiveness():
-    effectiveness = build_practice_effectiveness()
-    st.subheader("Practice Effectiveness")
-
-    if not effectiveness.get("has_effectiveness", False):
-        st.info(effectiveness.get("message", "Practice effectiveness appears after at least two sessions."))
-        return
-
-    c1, c2 = st.columns(2)
-    with c1:
-        st.metric("Overall Direction", effectiveness.get("overall_direction", "-"))
-        st.metric("Best Improvement", effectiveness.get("best_improvement", "-"), effectiveness.get("best_delta", 0))
-    with c2:
-        st.metric("Biggest Risk", effectiveness.get("biggest_risk", "-"), effectiveness.get("risk_delta", 0))
-
-    st.write("**Recommendation**")
-    st.write(effectiveness.get("recommendation", "-"))
-    st.divider()
-
-
-def render_distance_intelligence(data):
-    st.subheader("Distance Intelligence")
-
-    distance_info = build_distance_intelligence(
-        data.get("df"),
-        club_label=data.get("club_label", "7i")
-    )
-
-    if not distance_info.get("has_distance_intel", False):
-        st.info("Distance intelligence unavailable.")
-        return
-
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        st.metric("Club", distance_info.get("club", "-"))
-        st.metric("Average Carry", f'{distance_info.get("avg_carry", 0)} m')
-    with c2:
-        st.metric("Reliable Range", f'{distance_info.get("reliable_min", 0)}–{distance_info.get("reliable_max", 0)} m')
-        st.metric("Confidence", distance_info.get("confidence", "-"))
-    with c3:
-        st.metric("Full Range", f'{distance_info.get("full_min", 0)}–{distance_info.get("full_max", 0)} m')
-        st.metric("Spread", f'{distance_info.get("distance_spread", 0)} m')
-
-    st.write("**Recommendation**")
-    st.write(distance_info.get("recommendation", "-"))
-    st.divider()
-
-
 def render_trend_chart(x, y, title, ylabel):
-    fig, ax = plt.subplots(figsize=(6.5, 3.8))
+    fig, ax = plt.subplots(figsize=(6.2, 3.6))
     ax.plot(x, y, marker="o")
     ax.set_title(title)
     ax.set_xlabel("Session Date")
@@ -255,11 +312,9 @@ def render_trend_chart(x, y, title, ylabel):
 
 def render_progress_section():
     render_learning_section()
-    render_practice_effectiveness()
-
     st.subheader("Progress Over Time")
-    trend = build_trend_data()
 
+    trend = build_trend_data()
     if trend.get("has_history", False):
         c1, c2 = st.columns(2)
         with c1:
@@ -274,8 +329,11 @@ def render_swing_section(data):
     st.subheader("Swing Blueprint")
 
     c1, c2 = st.columns(2)
-    c1.metric("Blueprint Matches", f"{data.get('blueprint_matches', 0)} / {data.get('blueprint_total', 0)}")
-    c2.metric("Match %", f"{data.get('blueprint_match_pct', 0)}%")
+    with c1:
+        st.metric("Blueprint Matches",
+                  f"{data.get('blueprint_matches', 0)} / {data.get('blueprint_total', 0)}")
+    with c2:
+        st.metric("Match %", f"{data.get('blueprint_match_pct', 0)}%")
 
     st.write(
         f"Target Pattern → Smash {data.get('bp_smash_target', 0)} | "
@@ -334,6 +392,7 @@ def command_centre_page():
             st.info("Upload an MLM2PRO CSV to begin analysis.")
             return
 
+    st.markdown('<div class="summary-strip"></div>', unsafe_allow_html=True)
     render_summary_panel(data)
 
     overview_tab, focus_tab, progress_tab, swing_tab = st.tabs(
@@ -341,14 +400,27 @@ def command_centre_page():
     )
 
     with overview_tab:
-        render_performance_gauge(data.get("performance_score", 0))
-        st.divider()
-        render_shot_pattern_chart(data)
-        st.divider()
-        render_session_comparison()
-        st.divider()
-        render_practice_effectiveness()
-        render_distance_intelligence(data)
+        top_left, top_right = st.columns(2)
+        with top_left:
+            st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+            render_performance_gauge(data.get("performance_score", 0))
+            st.markdown('</div>', unsafe_allow_html=True)
+        with top_right:
+            st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+            render_distance_intelligence_card(data)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        bottom_left, bottom_right = st.columns(2)
+        with bottom_left:
+            st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+            render_shot_pattern_chart(data)
+            st.markdown('</div>', unsafe_allow_html=True)
+        with bottom_right:
+            st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+            render_session_comparison_card()
+            st.divider()
+            render_practice_effectiveness_card()
+            st.markdown('</div>', unsafe_allow_html=True)
 
     with focus_tab:
         render_focus_section(data)
