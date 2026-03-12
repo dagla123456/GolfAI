@@ -26,6 +26,7 @@ from golfai.learning_engine import build_learning_insights
 from golfai.practice_effectiveness import build_practice_effectiveness
 from golfai.distance_engine import build_distance_intelligence
 from golfai.distance_chart import render_distance_range_chart
+from golfai.dispersion_chart import render_professional_dispersion_chart
 
 
 def inject_styles():
@@ -148,49 +149,13 @@ def render_performance_gauge(score):
 
 
 def render_shot_pattern_chart(data):
-    points = data.get("shot_pattern_points", [])
-
     st.markdown('<div class="section-title">Shot Pattern</div>', unsafe_allow_html=True)
 
-    if not points:
+    fig = render_professional_dispersion_chart(data)
+    if fig is None:
         st.info("No shot pattern data available.")
         return
 
-    df = pd.DataFrame(points, columns=["Side Carry", "Carry Distance"])
-    mean_side = data.get("mean_side", 0)
-    mean_carry = data.get("mean_carry", 0)
-    ellipse_width = data.get("ellipse_width", 0)
-    ellipse_height = data.get("ellipse_height", 0)
-    corridor_m = data.get("corridor_m", 5)
-
-    fig, ax = plt.subplots(figsize=(6.6, 5.4))
-    ax.axvspan(-corridor_m, corridor_m, alpha=0.14)
-    ax.axvline(0, linewidth=1.6, linestyle="--")
-    ax.scatter(df["Side Carry"], df["Carry Distance"], s=46, alpha=0.85)
-    ax.scatter(mean_side, mean_carry, marker="D", s=90, zorder=5)
-
-    if ellipse_width > 0 and ellipse_height > 0:
-        ellipse = Ellipse((mean_side, mean_carry),
-                          width=ellipse_width * 2,
-                          height=ellipse_height * 2,
-                          fill=False, linewidth=2.0)
-        ax.add_patch(ellipse)
-
-    ax.set_title("Shot Dispersion Pattern", pad=10)
-    ax.set_xlabel("Side Carry (m)")
-    ax.set_ylabel("Carry Distance (m)")
-    ax.grid(True, linewidth=0.45, alpha=0.6)
-
-    x_pad = max(corridor_m, abs(df["Side Carry"]).max() if len(df) else 5) + 4
-    y_min = max(0, df["Carry Distance"].min() - 8)
-    y_max = df["Carry Distance"].max() + 8
-    ax.set_xlim(-x_pad, x_pad)
-    ax.set_ylim(y_min, y_max)
-
-    for spine in ["top", "right"]:
-        ax.spines[spine].set_visible(False)
-
-    plt.tight_layout()
     st.pyplot(fig, clear_figure=True)
 
 
