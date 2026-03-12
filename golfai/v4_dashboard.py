@@ -7,7 +7,6 @@ from golfai.v4_cards import card_open, card_close
 from golfai.data_loader import list_sessions
 from golfai.engine import run_golfai_analysis
 from golfai.distance_engine import build_distance_intelligence
-from golfai.v4_charts import build_v4_distance_chart
 
 
 def build_v4_gauge(score: float):
@@ -20,7 +19,7 @@ def build_v4_gauge(score: float):
         gauge={
             "axis": {"range": [0, 100], "tickcolor": "#cfd8dc"},
             "bar": {"color": "rgba(0,0,0,0)"},
-            "bgcolor": "#0f1f26",
+            "bgcolor": "#142c34",
             "borderwidth": 0,
             "steps": [
                 {"range": [0, 35], "color": "#ff4d4d"},
@@ -45,6 +44,72 @@ def build_v4_gauge(score: float):
     return fig
 
 
+def build_distance_profile_figure(distance_info):
+    avg = float(distance_info.get("avg_carry", 0))
+    rmin = float(distance_info.get("reliable_min", 0))
+    rmax = float(distance_info.get("reliable_max", 0))
+    fmin = float(distance_info.get("full_min", 0))
+    fmax = float(distance_info.get("full_max", 0))
+
+    fig = go.Figure()
+
+    # full range band
+    fig.add_shape(
+        type="rect",
+        x0=fmin, x1=fmax, y0=0.36, y1=0.64,
+        line=dict(width=0),
+        fillcolor="rgba(160,170,180,0.18)"
+    )
+
+    # reliable range band
+    fig.add_shape(
+        type="rect",
+        x0=rmin, x1=rmax, y0=0.28, y1=0.72,
+        line=dict(width=0),
+        fillcolor="rgba(30,215,96,0.85)"
+    )
+
+    # avg marker
+    fig.add_trace(go.Scatter(
+        x=[avg],
+        y=[0.5],
+        mode="markers+text",
+        marker=dict(size=16, color="rgba(255,90,90,1)"),
+        text=[f"Avg {avg:.1f}m"],
+        textposition="top center",
+        textfont=dict(color="white", size=13),
+        showlegend=False
+    ))
+
+    # labels
+    fig.add_annotation(x=fmin, y=0.12, text=f"{fmin:.0f}m", showarrow=False, font=dict(color="white", size=12))
+    fig.add_annotation(x=fmax, y=0.12, text=f"{fmax:.0f}m", showarrow=False, font=dict(color="white", size=12))
+    fig.add_annotation(
+        x=(rmin + rmax) / 2,
+        y=0.88,
+        text=f"Reliable {rmin:.1f}–{rmax:.1f}m",
+        showarrow=False,
+        font=dict(color="#dff7ea", size=13)
+    )
+
+    fig.update_layout(
+        height=250,
+        margin=dict(l=10, r=10, t=10, b=10),
+        paper_bgcolor="#142c34",
+        plot_bgcolor="#142c34",
+        xaxis=dict(
+            range=[fmin - 5, fmax + 5],
+            visible=False
+        ),
+        yaxis=dict(
+            range=[0, 1],
+            visible=False
+        )
+    )
+
+    return fig
+
+
 def render_distance_profile(data):
     distance_info = build_distance_intelligence(
         data.get("df"),
@@ -63,14 +128,8 @@ def render_distance_profile(data):
     with c3:
         st.metric("Confidence", distance_info.get("confidence", "-"))
 
-    st.caption(
-        f'Reliable {distance_info.get("reliable_min", 0)}–{distance_info.get("reliable_max", 0)} m'
-        f'   |   Full {distance_info.get("full_min", 0)}–{distance_info.get("full_max", 0)} m'
-    )
-
-    fig = build_v4_distance_chart(distance_info)
-    if fig is not None:
-        st.plotly_chart(fig, use_container_width=True)
+    fig = build_distance_profile_figure(distance_info)
+    st.plotly_chart(fig, use_container_width=True)
 
     st.write("**Recommendation**")
     st.write(distance_info.get("recommendation", "-"))
