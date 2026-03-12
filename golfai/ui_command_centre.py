@@ -12,6 +12,8 @@ UX Uplift Pack v1
 """
 
 import streamlit as st
+from golfai.v4_styles import get_v4_css
+from golfai.v4_cards import card_open, card_close
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -325,6 +327,8 @@ def render_swing_section(data):
 
 
 def command_centre_page():
+    st.markdown(get_v4_css(), unsafe_allow_html=True)
+
     inject_styles()
     render_title()
 
@@ -372,27 +376,32 @@ def command_centre_page():
     )
 
     with overview_tab:
-        top_left, top_right = st.columns(2)
-        with top_left:
-            st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-            render_performance_gauge(data.get("performance_score", 0))
-            st.markdown('</div>', unsafe_allow_html=True)
-        with top_right:
-            st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-            render_distance_intelligence_card(data)
-            st.markdown('</div>', unsafe_allow_html=True)
 
-        bottom_left, bottom_right = st.columns(2)
-        with bottom_left:
-            st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+        row1_col1, row1_col2 = st.columns(2)
+
+        with row1_col1:
+            card_open("Performance Score")
+            render_performance_gauge(data.get("performance_score", 0))
+            card_close()
+
+        with row1_col2:
+            card_open("Carry Distance Profile")
+            render_distance_intelligence_card(data)
+            card_close()
+
+        row2_col1, row2_col2 = st.columns(2)
+
+        with row2_col1:
+            card_open("Shot Dispersion")
             render_shot_pattern_chart(data)
-            st.markdown('</div>', unsafe_allow_html=True)
-        with bottom_right:
-            st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+            card_close()
+
+        with row2_col2:
+            card_open("Session Summary")
             render_session_comparison_card()
             st.divider()
             render_practice_effectiveness_card()
-            st.markdown('</div>', unsafe_allow_html=True)
+            card_close()
 
     with focus_tab:
         render_focus_section(data)
