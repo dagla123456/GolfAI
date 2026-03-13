@@ -10,7 +10,7 @@ Change Summary:
 
 import streamlit as st
 
-from golfai.v4_dashboard import render_v4_dashboard_shell
+from golfai.v4_dashboard_prototype import render_v4_dashboard_prototype
 from golfai.oncourse_ui import oncourse_page
 
 st.set_page_config(
@@ -56,6 +56,6 @@ mode = st.radio(
 )
 
 if mode == "Command Centre":
-    render_v4_dashboard_shell()
+    render_v4_dashboard_prototype()
 else:
     oncourse_page()
