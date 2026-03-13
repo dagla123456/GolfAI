@@ -1,11 +1,11 @@
-import streamlit as st
+import streamlit.components.v1 as components
 
 
 def render_v4_header(data):
     session = data.get("session_file", "Practice Session")
     shots = data.get("shots_analysed", 0)
 
-    st.markdown(f"""
+    html = f"""
     <div style="
         background: linear-gradient(135deg,#183a2d,#1f4a35);
         padding:22px 24px;
@@ -15,6 +15,8 @@ def render_v4_header(data):
         justify-content:space-between;
         align-items:center;
         box-shadow:0 10px 24px rgba(0,0,0,0.28);
+        color:white;
+        font-family:Arial, sans-serif;
     ">
         <div>
             <div style="
@@ -47,4 +49,6 @@ def render_v4_header(data):
             AI Practice Intelligence
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
+
+    components.html(html, height=120)
