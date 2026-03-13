@@ -1,4 +1,5 @@
 import streamlit as st
+from golfai.v4_header import render_v4_header
 import plotly.graph_objects as go
 from io import BytesIO
 
@@ -296,6 +297,8 @@ def render_v4_dashboard_shell():
             st.info("Upload an MLM2PRO CSV to begin analysis.")
             st.markdown("</div>", unsafe_allow_html=True)
             return
+
+    render_v4_header(data)
 
     row1_col1, row1_col2 = st.columns(2)
 
