@@ -7,6 +7,7 @@ from golfai.v4_cards import card_open, card_close
 from golfai.data_loader import list_sessions
 from golfai.engine import run_golfai_analysis
 from golfai.distance_engine import build_distance_intelligence
+from golfai.comparison import compare_latest_sessions
 from golfai.v4_dispersion import build_v4_dispersion_figure
 from golfai.v4_distance_profile import render_v4_distance_profile
 
@@ -126,6 +127,29 @@ def render_distance_profile(data):
     st.write(distance_info.get("recommendation", "-"))
 
 
+def render_session_summary(data):
+    comparison = compare_latest_sessions()
+
+    strike_value = data.get("strike_quality", 0)
+    blueprint_value = data.get("blueprint_match_pct", 0)
+    dispersion_value = data.get("start_line_control", 0)
+
+    strike_delta = comparison.get("performance_delta", 0) if comparison.get("has_comparison", False) else 0
+    blueprint_delta = comparison.get("blueprint_delta", 0) if comparison.get("has_comparison", False) else 0
+    dispersion_delta = comparison.get("corridor_delta", 0) if comparison.get("has_comparison", False) else 0
+
+    c1, c2, c3 = st.columns(3)
+
+    with c1:
+        st.metric("Strike Quality", strike_value, strike_delta)
+
+    with c2:
+        st.metric("Blueprint Match", f"{blueprint_value}%", blueprint_delta)
+
+    with c3:
+        st.metric("Dispersion Control", dispersion_value, dispersion_delta)
+
+
 def render_v4_dashboard_shell():
     st.markdown(get_v4_css(), unsafe_allow_html=True)
     st.markdown('<div class="v4-shell">', unsafe_allow_html=True)
@@ -188,7 +212,7 @@ def render_v4_dashboard_shell():
 
     with row2_col2:
         card_open("Session Summary")
-        st.write("V4 placeholder")
+        render_session_summary(data)
         card_close()
 
     row3_col1, row3_col2 = st.columns([1.1, 1.0])
