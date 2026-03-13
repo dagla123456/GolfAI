@@ -41,7 +41,7 @@ def build_v4_gauge(score: float):
     ))
 
     fig.update_layout(
-        height=280,
+        height=220,
         margin=dict(l=10, r=10, t=20, b=10),
         paper_bgcolor="#142c34",
         font={"color": "#e8f0f2"}
@@ -94,7 +94,7 @@ def build_distance_profile_figure(distance_info):
     )
 
     fig.update_layout(
-        height=250,
+        height=170,
         margin=dict(l=10, r=10, t=10, b=10),
         paper_bgcolor="#142c34",
         plot_bgcolor="#142c34",
