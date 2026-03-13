@@ -214,10 +214,27 @@ def render_practice_focus(data):
         st.metric("Secondary Issue", secondary)
 
     st.markdown("**Recommended Focus**")
-    st.write(focus)
+
+    if isinstance(focus, list):
+        for cue in focus:
+            st.write(f"• {cue}")
+    else:
+        st.write(focus)
 
     st.markdown("**Practice Plan**")
-    st.write(plan)
+
+    if isinstance(plan, dict):
+        st.write(f"**Session Goal:** {plan.get('session_goal','-')}")
+        st.write(f"**Recommended Drill:** {plan.get('recommended_drill','-')}")
+        st.write(f"**Priority:** {plan.get('practice_priority','-')}")
+
+        st.write("**Targets**")
+        st.write(f"Smash: {plan.get('target_smash','-')}")
+        st.write(f"Attack Angle: {plan.get('target_attack_window','-')}")
+        st.write(f"Start Line: {plan.get('target_launch_direction','-')}")
+        st.write(f"Club Path: {plan.get('target_path_window','-')}")
+    else:
+        st.write(plan)
 
 def render_v4_dashboard_shell():
     st.markdown(get_v4_css(), unsafe_allow_html=True)
