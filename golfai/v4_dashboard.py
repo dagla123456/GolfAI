@@ -7,6 +7,7 @@ from golfai.v4_cards import card_open, card_close
 from golfai.data_loader import list_sessions
 from golfai.engine import run_golfai_analysis
 from golfai.distance_engine import build_distance_intelligence
+from golfai.v4_dispersion import build_v4_dispersion_figure
 
 
 def build_v4_gauge(score: float):
@@ -53,7 +54,6 @@ def build_distance_profile_figure(distance_info):
 
     fig = go.Figure()
 
-    # full range band
     fig.add_shape(
         type="rect",
         x0=fmin, x1=fmax, y0=0.36, y1=0.64,
@@ -61,7 +61,6 @@ def build_distance_profile_figure(distance_info):
         fillcolor="rgba(160,170,180,0.18)"
     )
 
-    # reliable range band
     fig.add_shape(
         type="rect",
         x0=rmin, x1=rmax, y0=0.28, y1=0.72,
@@ -69,7 +68,6 @@ def build_distance_profile_figure(distance_info):
         fillcolor="rgba(30,215,96,0.85)"
     )
 
-    # avg marker
     fig.add_trace(go.Scatter(
         x=[avg],
         y=[0.5],
@@ -81,7 +79,6 @@ def build_distance_profile_figure(distance_info):
         showlegend=False
     ))
 
-    # labels
     fig.add_annotation(x=fmin, y=0.12, text=f"{fmin:.0f}m", showarrow=False, font=dict(color="white", size=12))
     fig.add_annotation(x=fmax, y=0.12, text=f"{fmax:.0f}m", showarrow=False, font=dict(color="white", size=12))
     fig.add_annotation(
@@ -97,14 +94,8 @@ def build_distance_profile_figure(distance_info):
         margin=dict(l=10, r=10, t=10, b=10),
         paper_bgcolor="#142c34",
         plot_bgcolor="#142c34",
-        xaxis=dict(
-            range=[fmin - 5, fmax + 5],
-            visible=False
-        ),
-        yaxis=dict(
-            range=[0, 1],
-            visible=False
-        )
+        xaxis=dict(range=[fmin - 5, fmax + 5], visible=False),
+        yaxis=dict(range=[0, 1], visible=False)
     )
 
     return fig
@@ -188,7 +179,11 @@ def render_v4_dashboard_shell():
     row2_col1, row2_col2 = st.columns(2)
     with row2_col1:
         card_open("Shot Dispersion")
-        st.write("V4 placeholder")
+        fig = build_v4_dispersion_figure(data)
+        if fig is not None:
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("No shot pattern data available.")
         card_close()
 
     with row2_col2:
