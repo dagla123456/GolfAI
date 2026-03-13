@@ -15,7 +15,7 @@ def build_oncourse_cues():
     if not history:
         return {
             "has_cues": False,
-            "message": "No practice session available."
+            "message": "No practice session availablex."
         }
 
     latest = history[-1]
