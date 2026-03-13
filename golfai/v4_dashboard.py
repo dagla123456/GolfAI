@@ -139,16 +139,40 @@ def render_session_summary(data):
     blueprint_delta = comparison.get("blueprint_delta", 0) if comparison.get("has_comparison", False) else 0
     dispersion_delta = comparison.get("corridor_delta", 0) if comparison.get("has_comparison", False) else 0
 
-    c1, c2, c3 = st.columns(3)
+    def delta_html(value):
+        try:
+            val = float(value)
+        except Exception:
+            val = 0.0
 
-    with c1:
-        st.metric("Strike Quality", strike_value, strike_delta)
+        arrow = "▲" if val >= 0 else "▼"
+        color = "#1ed760" if val >= 0 else "#ff6b6b"
+        sign = "+" if val >= 0 else ""
+        return f'<span style="color:{color}; font-weight:700; font-size:14px;">{arrow} {sign}{val:.0f}</span>'
 
-    with c2:
-        st.metric("Blueprint Match", f"{blueprint_value}%", blueprint_delta)
+    cards = [
+        ("Strike Quality", f"{strike_value}", delta_html(strike_delta)),
+        ("Blueprint Match", f"{blueprint_value}%", delta_html(blueprint_delta)),
+        ("Dispersion Control", f"{dispersion_value}", delta_html(dispersion_delta)),
+    ]
 
-    with c3:
-        st.metric("Dispersion Control", dispersion_value, dispersion_delta)
+    cols = st.columns(3)
+
+    for col, (label, value, delta) in zip(cols, cards):
+        with col:
+            st.markdown(f"""
+            <div style="
+                background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 16px;
+                padding: 14px 12px;
+                min-height: 118px;
+            ">
+                <div style="color:#c7d4da; font-size:13px; margin-bottom:10px;">{label}</div>
+                <div style="color:#f4f7fa; font-size:32px; font-weight:800; line-height:1;">{value}</div>
+                <div style="margin-top:10px;">{delta}</div>
+            </div>
+            """, unsafe_allow_html=True)
 
 
 
