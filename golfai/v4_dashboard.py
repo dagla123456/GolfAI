@@ -300,6 +300,112 @@ def render_v4_dashboard_shell():
 
     render_v4_header(data)
 
+    
+    # --- ROW 1 ---
+    row1_col1, row1_col2 = st.columns(2)
+
+    with row1_col1:
+        render_performance_gauge(data.get("performance_score", 0))
+
+    with row1_col2:
+        render_v4_distance_profile(distance_info)
+
+    # --- ROW 2 ---
+    row2_col1, row2_col2 = st.columns(2)
+
+    with row2_col1:
+        render_v4_dispersion_panel(data)
+
+    with row2_col2:
+        render_session_summary(data)
+
+    # --- ROW 3 ---
+    row3_col1, row3_col2 = st.columns(2)
+
+    with row3_col1:
+        render_progress_chart()
+
+    with row3_col2:
+        render_practice_focus(data)
+:
+
+    focus = data.get("practice_focus", "None")
+    primary = data.get("primary_issue", "-")
+    secondary = data.get("secondary_issue", "-")
+    plan = data.get("practice_plan", "-")
+
+    st.markdown("### Practice Focus")
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.metric("Primary Issue", primary)
+
+    with c2:
+        st.metric("Secondary Issue", secondary)
+
+    st.markdown("**Recommended Focus**")
+
+    if isinstance(focus, list):
+        for cue in focus:
+            st.write(f"• {cue}")
+    else:
+        st.write(focus)
+
+    st.markdown("**Practice Plan**")
+
+    if isinstance(plan, dict):
+        st.write(f"**Session Goal:** {plan.get('session_goal','-')}")
+        st.write(f"**Recommended Drill:** {plan.get('recommended_drill','-')}")
+        st.write(f"**Priority:** {plan.get('practice_priority','-')}")
+
+        st.write("**Targets**")
+        st.write(f"Smash: {plan.get('target_smash','-')}")
+        st.write(f"Attack Angle: {plan.get('target_attack_window','-')}")
+        st.write(f"Start Line: {plan.get('target_launch_direction','-')}")
+        st.write(f"Club Path: {plan.get('target_path_window','-')}")
+    else:
+        st.write(plan)
+
+def render_v4_dashboard_shell():
+    st.markdown(get_v4_css(), unsafe_allow_html=True)
+    st.markdown('<div class="v4-shell">', unsafe_allow_html=True)
+    st.markdown('<div class="v4-title">GOLF AI COMMAND CENTRE</div>', unsafe_allow_html=True)
+
+    if "latest_upload_bytes" not in st.session_state:
+        st.session_state["latest_upload_bytes"] = None
+    if "latest_upload_name" not in st.session_state:
+        st.session_state["latest_upload_name"] = None
+
+    uploaded_file = st.file_uploader(
+        "Upload CSV / Select Session",
+        type=["csv"],
+        key="v4_dashboard_upload"
+    )
+
+    if uploaded_file is not None:
+        st.session_state["latest_upload_bytes"] = uploaded_file.getvalue()
+        st.session_state["latest_upload_name"] = uploaded_file.name
+
+    data = None
+
+    if st.session_state["latest_upload_bytes"] is not None:
+        file_like = BytesIO(st.session_state["latest_upload_bytes"])
+        file_like.name = st.session_state["latest_upload_name"]
+        data = run_golfai_analysis(uploaded_file=file_like)
+        st.caption(f"Loaded session: {st.session_state['latest_upload_name']}")
+    else:
+        sessions = list_sessions()
+        if sessions:
+            selected = st.selectbox("Select Session", sessions, index=len(sessions) - 1)
+            data = run_golfai_analysis(session_file=selected)
+        else:
+            st.info("Upload an MLM2PRO CSV to begin analysis.")
+            st.markdown("</div>", unsafe_allow_html=True)
+            return
+
+    render_v4_header(data)
+
     row1_col1, row1_col2 = st.columns(2)
 
     with row1_col1:
