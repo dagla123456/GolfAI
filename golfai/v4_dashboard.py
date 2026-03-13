@@ -8,6 +8,7 @@ from golfai.data_loader import list_sessions
 from golfai.engine import run_golfai_analysis
 from golfai.distance_engine import build_distance_intelligence
 from golfai.comparison import compare_latest_sessions
+from golfai.trends import build_trend_data
 from golfai.v4_dispersion import build_v4_dispersion_figure
 from golfai.v4_distance_profile import render_v4_distance_profile
 
@@ -150,6 +151,49 @@ def render_session_summary(data):
         st.metric("Dispersion Control", dispersion_value, dispersion_delta)
 
 
+
+
+def render_progress_chart():
+    trend = build_trend_data()
+
+    if not trend.get("has_history", False):
+        st.info("Trend history will appear after multiple sessions.")
+        return
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=trend["dates"],
+        y=trend["performance"],
+        mode="lines+markers",
+        name="Performance",
+        line=dict(color="#1ed760", width=3),
+        marker=dict(size=8)
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=trend["dates"],
+        y=trend["dispersion"],
+        mode="lines+markers",
+        name="Dispersion",
+        line=dict(color="#ff8c42", width=3),
+        marker=dict(size=8)
+    ))
+
+    fig.update_layout(
+        height=330,
+        margin=dict(l=10, r=10, t=10, b=10),
+        paper_bgcolor="#142c34",
+        plot_bgcolor="#0f1f26",
+        font=dict(color="#e8f0f2"),
+        legend=dict(orientation="h", y=1.05, x=0)
+    )
+
+    fig.update_xaxes(gridcolor="rgba(255,255,255,0.08)")
+    fig.update_yaxes(gridcolor="rgba(255,255,255,0.08)")
+
+    st.plotly_chart(fig, use_container_width=True)
+
 def render_v4_dashboard_shell():
     st.markdown(get_v4_css(), unsafe_allow_html=True)
     st.markdown('<div class="v4-shell">', unsafe_allow_html=True)
@@ -218,7 +262,7 @@ def render_v4_dashboard_shell():
     row3_col1, row3_col2 = st.columns([1.1, 1.0])
     with row3_col1:
         card_open("Progress Over Time")
-        st.write("V4 placeholder")
+        render_progress_chart()
         card_close()
 
     with row3_col2:
