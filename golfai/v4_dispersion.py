@@ -23,7 +23,15 @@ def build_v4_dispersion_figure(data):
 
     fig = go.Figure()
 
-    # corridor
+    # soft radar background bands
+    fig.add_hrect(
+        y0=y_min, y1=y_max,
+        fillcolor="rgba(255,255,255,0.015)",
+        line_width=0,
+        layer="below"
+    )
+
+    # target corridor
     fig.add_vrect(
         x0=-corridor_m,
         x1=corridor_m,
@@ -35,12 +43,12 @@ def build_v4_dispersion_figure(data):
     # center line
     fig.add_vline(
         x=0,
-        line_width=2,
+        line_width=2.2,
         line_dash="dash",
         line_color="rgba(255,255,255,0.45)"
     )
 
-    # ellipse fill
+    # ellipse fill + outline
     if ellipse_width > 0 and ellipse_height > 0:
         t = np.linspace(0, 2 * np.pi, 180)
         ex = mean_side + ellipse_width * np.cos(t)
@@ -50,9 +58,9 @@ def build_v4_dispersion_figure(data):
             x=ex,
             y=ey,
             mode="lines",
-            line=dict(color="rgba(255,255,255,0.75)", width=2),
+            line=dict(color="rgba(255,255,255,0.82)", width=2.6),
             fill="toself",
-            fillcolor="rgba(255,255,255,0.08)",
+            fillcolor="rgba(30,215,96,0.12)",
             hoverinfo="skip",
             showlegend=False
         ))
@@ -63,9 +71,9 @@ def build_v4_dispersion_figure(data):
         y=df["Carry Distance"],
         mode="markers",
         marker=dict(
-            size=11,
-            color="rgba(0,220,160,0.88)",
-            line=dict(width=1, color="rgba(255,255,255,0.18)")
+            size=10,
+            color="rgba(230,255,200,0.9)",
+            line=dict(width=1, color="rgba(0,0,0,0.25)")
         ),
         hovertemplate="Side: %{x:.1f}m<br>Carry: %{y:.1f}m<extra></extra>",
         showlegend=False
@@ -77,23 +85,23 @@ def build_v4_dispersion_figure(data):
         y=[mean_carry],
         mode="markers",
         marker=dict(
-            size=24,
-            color="rgba(255,90,90,0.18)"
+            size=28,
+            color="rgba(255,70,70,0.18)"
         ),
         hoverinfo="skip",
         showlegend=False
     ))
 
-    # centroid
+    # centroid marker
     fig.add_trace(go.Scatter(
         x=[mean_side],
         y=[mean_carry],
         mode="markers",
         marker=dict(
-            size=15,
-            color="rgba(255,90,90,1)",
+            size=16,
+            color="rgba(255,70,70,1)",
             symbol="diamond",
-            line=dict(width=1, color="rgba(255,255,255,0.45)")
+            line=dict(width=1.2, color="rgba(255,255,255,0.55)")
         ),
         hovertemplate="Center<br>Side: %{x:.1f}m<br>Carry: %{y:.1f}m<extra></extra>",
         showlegend=False
@@ -101,7 +109,7 @@ def build_v4_dispersion_figure(data):
 
     fig.update_layout(
         height=440,
-        margin=dict(l=10, r=10, t=8, b=8),
+        margin=dict(l=8, r=8, t=8, b=8),
         paper_bgcolor="#142c34",
         plot_bgcolor="#0f1f26",
         font=dict(color="#e8f0f2")
@@ -110,15 +118,19 @@ def build_v4_dispersion_figure(data):
     fig.update_xaxes(
         title="Side Carry (m)",
         range=[x_min, x_max],
-        gridcolor="rgba(255,255,255,0.08)",
-        zeroline=False
+        gridcolor="rgba(255,255,255,0.07)",
+        zeroline=False,
+        showline=False,
+        tickfont=dict(color="rgba(230,240,245,0.9)")
     )
 
     fig.update_yaxes(
         title="Carry Distance (m)",
         range=[y_min, y_max],
-        gridcolor="rgba(255,255,255,0.08)",
-        zeroline=False
+        gridcolor="rgba(255,255,255,0.07)",
+        zeroline=False,
+        showline=False,
+        tickfont=dict(color="rgba(230,240,245,0.9)")
     )
 
     return fig
