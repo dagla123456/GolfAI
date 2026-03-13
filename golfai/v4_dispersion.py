@@ -108,7 +108,7 @@ def build_v4_dispersion_figure(data):
     ))
 
     fig.update_layout(
-        height=440,
+        height=320,
         margin=dict(l=8, r=8, t=8, b=8),
         paper_bgcolor="#142c34",
         plot_bgcolor="#0f1f26",
