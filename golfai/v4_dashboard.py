@@ -194,6 +194,31 @@ def render_progress_chart():
 
     st.plotly_chart(fig, use_container_width=True)
 
+
+
+def render_practice_focus(data):
+
+    focus = data.get("practice_focus", "None")
+    primary = data.get("primary_issue", "-")
+    secondary = data.get("secondary_issue", "-")
+    plan = data.get("practice_plan", "-")
+
+    st.markdown("### Practice Focus")
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.metric("Primary Issue", primary)
+
+    with c2:
+        st.metric("Secondary Issue", secondary)
+
+    st.markdown("**Recommended Focus**")
+    st.write(focus)
+
+    st.markdown("**Practice Plan**")
+    st.write(plan)
+
 def render_v4_dashboard_shell():
     st.markdown(get_v4_css(), unsafe_allow_html=True)
     st.markdown('<div class="v4-shell">', unsafe_allow_html=True)
@@ -267,7 +292,7 @@ def render_v4_dashboard_shell():
 
     with row3_col2:
         card_open("Practice Focus")
-        st.write("V4 placeholder")
+        render_practice_focus(data)
         card_close()
 
     st.markdown('</div>', unsafe_allow_html=True)
