@@ -16,43 +16,33 @@ def build_v4_dispersion_figure(data):
     ellipse_width = float(data.get("ellipse_width", 0))
     ellipse_height = float(data.get("ellipse_height", 0))
 
-    x_min = min(df["Side Carry"].min(), -corridor_m) - 5
-    x_max = max(df["Side Carry"].max(), corridor_m) + 5
-    y_min = max(0, df["Carry Distance"].min() - 8)
-    y_max = df["Carry Distance"].max() + 8
+    x_min = min(df["Side Carry"].min(), -corridor_m) - 6
+    x_max = max(df["Side Carry"].max(), corridor_m) + 6
+    y_min = max(0, df["Carry Distance"].min() - 10)
+    y_max = df["Carry Distance"].max() + 10
 
     fig = go.Figure()
 
+    # corridor
     fig.add_vrect(
         x0=-corridor_m,
         x1=corridor_m,
-        fillcolor="rgba(30,215,96,0.12)",
+        fillcolor="rgba(30,215,96,0.16)",
         line_width=0,
         layer="below"
     )
 
+    # center line
     fig.add_vline(
         x=0,
         line_width=2,
         line_dash="dash",
-        line_color="rgba(220,220,220,0.7)"
+        line_color="rgba(255,255,255,0.45)"
     )
 
-    fig.add_trace(go.Scatter(
-        x=df["Side Carry"],
-        y=df["Carry Distance"],
-        mode="markers",
-        marker=dict(
-            size=10,
-            color="rgba(0,220,160,0.82)",
-            line=dict(width=1, color="rgba(255,255,255,0.12)")
-        ),
-        hovertemplate="Side: %{x:.1f}m<br>Carry: %{y:.1f}m<extra></extra>",
-        showlegend=False
-    ))
-
+    # ellipse fill
     if ellipse_width > 0 and ellipse_height > 0:
-        t = np.linspace(0, 2 * np.pi, 120)
+        t = np.linspace(0, 2 * np.pi, 180)
         ex = mean_side + ellipse_width * np.cos(t)
         ey = mean_carry + ellipse_height * np.sin(t)
 
@@ -60,27 +50,58 @@ def build_v4_dispersion_figure(data):
             x=ex,
             y=ey,
             mode="lines",
-            line=dict(color="rgba(255,255,255,0.65)", width=2),
+            line=dict(color="rgba(255,255,255,0.75)", width=2),
+            fill="toself",
+            fillcolor="rgba(255,255,255,0.08)",
             hoverinfo="skip",
             showlegend=False
         ))
 
+    # shots
+    fig.add_trace(go.Scatter(
+        x=df["Side Carry"],
+        y=df["Carry Distance"],
+        mode="markers",
+        marker=dict(
+            size=11,
+            color="rgba(0,220,160,0.88)",
+            line=dict(width=1, color="rgba(255,255,255,0.18)")
+        ),
+        hovertemplate="Side: %{x:.1f}m<br>Carry: %{y:.1f}m<extra></extra>",
+        showlegend=False
+    ))
+
+    # centroid glow
     fig.add_trace(go.Scatter(
         x=[mean_side],
         y=[mean_carry],
         mode="markers",
         marker=dict(
-            size=16,
+            size=24,
+            color="rgba(255,90,90,0.18)"
+        ),
+        hoverinfo="skip",
+        showlegend=False
+    ))
+
+    # centroid
+    fig.add_trace(go.Scatter(
+        x=[mean_side],
+        y=[mean_carry],
+        mode="markers",
+        marker=dict(
+            size=15,
             color="rgba(255,90,90,1)",
-            symbol="diamond"
+            symbol="diamond",
+            line=dict(width=1, color="rgba(255,255,255,0.45)")
         ),
         hovertemplate="Center<br>Side: %{x:.1f}m<br>Carry: %{y:.1f}m<extra></extra>",
         showlegend=False
     ))
 
     fig.update_layout(
-        height=430,
-        margin=dict(l=10, r=10, t=10, b=10),
+        height=440,
+        margin=dict(l=10, r=10, t=8, b=8),
         paper_bgcolor="#142c34",
         plot_bgcolor="#0f1f26",
         font=dict(color="#e8f0f2")
