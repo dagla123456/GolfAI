@@ -66,42 +66,79 @@ def build_mock_distance():
 
 def build_mock_dispersion():
     fig = go.Figure()
-    fig.add_vrect(x0=-5, x1=5, fillcolor="rgba(30,215,96,0.16)", line_width=0, layer="below")
-    fig.add_vline(x=0, line_width=2, line_dash="dash", line_color="rgba(255,255,255,0.45)")
 
-    ex = [-8,-4,0,4,8,7,3,-1,-5,-7,-5,-1,3,6,4,0,-3,-6,-8]
-    ey = [116,121,124,121,116,110,105,103,105,110,116,121,124,121,116,112,110,112,116]
+    fig.add_hrect(y0=98, y1=122, fillcolor="rgba(255,255,255,0.015)", line_width=0, layer="below")
+    fig.add_vrect(x0=-5, x1=5, fillcolor="rgba(110,200,120,0.18)", line_width=0, layer="below")
+    fig.add_vline(x=0, line_width=2.2, line_dash="dash", line_color="rgba(255,255,255,0.55)")
+    fig.add_hline(y=110.5, line_width=1.6, line_color="rgba(255,255,255,0.35)")
+
+    ex1 = [-8,-4,0,4,8,7,3,-1,-5,-7,-5,-1,3,6,4,0,-3,-6,-8]
+    ey1 = [116,121,124,121,116,110,105,103,105,110,116,121,124,121,116,112,110,112,116]
     fig.add_trace(go.Scatter(
-        x=ex, y=ey, mode="lines",
-        line=dict(color="rgba(255,255,255,0.82)", width=2.2),
-        fill="toself", fillcolor="rgba(30,215,96,0.12)",
+        x=ex1, y=ey1, mode="lines",
+        line=dict(color="rgba(255,255,255,0.82)", width=2.4),
+        fill="toself", fillcolor="rgba(130,210,100,0.14)",
         hoverinfo="skip", showlegend=False
     ))
 
-    shots_x = [-2.8,-1.5,-0.3,0.8,2.1,-1.2,0.5,1.6,-0.8,2.8,-2.2,0.2]
-    shots_y = [104,108,111,109,105,114,116,113,118,107,110,112]
+    ex2 = [-5,-2,0,2,5,4,2,-1,-3,-4,-3,-1,2,4,3,0,-2,-4,-5]
+    ey2 = [113,116,118,116,113,110,108,107,108,110,113,116,118,116,113,111,110,111,113]
+    fig.add_trace(go.Scatter(
+        x=ex2, y=ey2, mode="lines",
+        line=dict(color="rgba(120,255,150,0.28)", width=1.2),
+        fill="toself", fillcolor="rgba(120,255,150,0.10)",
+        hoverinfo="skip", showlegend=False
+    ))
+
+    shots_x = [-2.8,-1.5,-0.3,0.8,2.1,-1.2,0.5,1.6,-0.8,2.8,-2.2,0.2,1.2,-1.9,2.4]
+    shots_y = [104,108,111,109,105,114,116,113,118,107,110,112,109,111,114]
     fig.add_trace(go.Scatter(
         x=shots_x, y=shots_y, mode="markers",
-        marker=dict(size=8, color="rgba(230,255,200,0.9)", line=dict(width=1, color="rgba(0,0,0,0.25)")),
+        marker=dict(
+            size=8,
+            color="rgba(240,245,210,0.96)",
+            line=dict(width=0.8, color="rgba(30,30,30,0.35)")
+        ),
         showlegend=False
     ))
 
-    fig.add_trace(go.Scatter(x=[0.4], y=[110.5], mode="markers",
-        marker=dict(size=20, color="rgba(255,70,70,0.18)"), showlegend=False))
-    fig.add_trace(go.Scatter(x=[0.4], y=[110.5], mode="markers",
-        marker=dict(size=12, color="rgba(255,70,70,1)", symbol="diamond",
-                    line=dict(width=1.2, color="rgba(255,255,255,0.55)")),
-        showlegend=False))
+    fig.add_trace(go.Scatter(
+        x=[0.4], y=[110.5], mode="markers",
+        marker=dict(size=24, color="rgba(255,70,70,0.18)"),
+        hoverinfo="skip", showlegend=False
+    ))
+    fig.add_trace(go.Scatter(
+        x=[0.4], y=[110.5], mode="markers",
+        marker=dict(
+            size=13,
+            color="rgba(255,70,70,1)",
+            symbol="diamond",
+            line=dict(width=1.2, color="rgba(255,255,255,0.55)")
+        ),
+        showlegend=False
+    ))
 
     fig.update_layout(
-        height=170,
+        height=180,
         margin=dict(l=6, r=6, t=6, b=6),
         paper_bgcolor="#142c34",
         plot_bgcolor="#0f1f26",
         font=dict(color="#e8f0f2")
     )
-    fig.update_xaxes(title="Side Carry (m)", range=[-12, 12], gridcolor="rgba(255,255,255,0.07)", zeroline=False)
-    fig.update_yaxes(title="Carry Distance (m)", range=[98, 122], gridcolor="rgba(255,255,255,0.07)", zeroline=False)
+    fig.update_xaxes(
+        title="Side Carry (m)",
+        range=[-12, 12],
+        gridcolor="rgba(255,255,255,0.08)",
+        zeroline=False,
+        tickfont=dict(size=10)
+    )
+    fig.update_yaxes(
+        title="Carry Distance (m)",
+        range=[98, 122],
+        gridcolor="rgba(255,255,255,0.08)",
+        zeroline=False,
+        tickfont=dict(size=10)
+    )
     return fig
 
 
