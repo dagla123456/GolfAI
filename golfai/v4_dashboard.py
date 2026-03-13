@@ -8,6 +8,7 @@ from golfai.data_loader import list_sessions
 from golfai.engine import run_golfai_analysis
 from golfai.distance_engine import build_distance_intelligence
 from golfai.v4_dispersion import build_v4_dispersion_figure
+from golfai.v4_distance_profile import render_v4_distance_profile
 
 
 def build_v4_gauge(score: float):
@@ -119,8 +120,7 @@ def render_distance_profile(data):
     with c3:
         st.metric("Confidence", distance_info.get("confidence", "-"))
 
-    fig = build_distance_profile_figure(distance_info)
-    st.plotly_chart(fig, use_container_width=True)
+    render_v4_distance_profile(distance_info)
 
     st.write("**Recommendation**")
     st.write(distance_info.get("recommendation", "-"))
