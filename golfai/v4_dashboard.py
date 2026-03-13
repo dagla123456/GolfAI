@@ -327,7 +327,6 @@ def render_v4_dashboard_shell():
 
     with row3_col2:
         render_practice_focus(data)
-:
 
     focus = data.get("practice_focus", "None")
     primary = data.get("primary_issue", "-")
