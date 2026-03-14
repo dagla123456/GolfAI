@@ -227,19 +227,20 @@ def build_premium_dispersion():
     )
 
     # one single dispersion ellipse
+    
     fig.add_trace(
         go.Scatter(
             x=ellipse_x,
             y=ellipse_y,
             mode="lines",
-            line=dict(color="rgba(255,255,255,0.72)", width=2.0),
+            line=dict(color="rgba(0,0,0,0)", width=0),
             fill="toself",
-            fillcolor="rgba(120,255,170,0.09)",
+            fillcolor="rgba(120,255,170,0.10)",
             hoverinfo="skip",
             showlegend=False,
         )
     )
-
+    
     # shot glow layer
     fig.add_trace(
         go.Scatter(
