@@ -9,7 +9,7 @@ def build_mock_gauge():
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=78,
-        number={"font": {"size": 28, "color": "#f5f7fa"}},
+        number={"font": {"size": 30, "color": "#f5f7fa"}},
         gauge={
             "axis": {"range": [0, 100], "tickcolor": "#cfd8dc"},
             "bar": {"color": "rgba(0,0,0,0)"},
@@ -29,13 +29,12 @@ def build_mock_gauge():
         }
     ))
     fig.update_layout(
-        height=145,
-        margin=dict(l=4, r=4, t=4, b=4),
+        height=165,
+        margin=dict(l=8, r=8, t=20, b=8),
         paper_bgcolor="#142c34",
         font={"color": "#e8f0f2"}
     )
     return fig
-
 
 def build_mock_distance():
     fig = go.Figure()
@@ -261,25 +260,27 @@ def render_v4_dashboard_prototype():
     components.html(header_html, height=68)
 
     top_left, top_right = st.columns(2)
-    with top_left:
-        card_open("Performance Score")
-        st.plotly_chart(build_mock_gauge(), use_container_width=True, config={"displayModeBar": False})
-
-        st.markdown("""
+with top_left:
+    card_open("Performance Score")
+    st.plotly_chart(build_mock_gauge(), use_container_width=True, config={"displayModeBar": False})
+    st.markdown(
+        """
         <div style="
-            display:flex;
-            justify-content:center;
-            margin-top:2px;
+            text-align:center;
+            margin-top:4px;
             font-size:12px;
             font-weight:700;
             color:#1ed760;
             letter-spacing:0.02em;
+            line-height:1.1;
         ">
-        ▲ Improving
-            </div>
-        """, unsafe_allow_html=True)
-        card_close()
-    with top_right:
+            ▲ Improving
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    card_close()   
+with top_right:
         card_open("Carry Distance Profile")
         st.plotly_chart(build_mock_distance(), use_container_width=True, config={"displayModeBar": False})
         st.markdown('<div style="font-size:11px; color:#d7e5ea; margin-top:2px;">Reliable carry window: 95–113 m</div>', unsafe_allow_html=True)
