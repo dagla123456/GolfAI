@@ -9,65 +9,65 @@ def get_premium_css():
     <style>
     html, body, [data-testid="stAppViewContainer"], [data-testid="stMainBlockContainer"] {
         background:
-            radial-gradient(circle at top left, rgba(35, 95, 70, 0.18), transparent 28%),
+            radial-gradient(circle at top left, rgba(35, 95, 70, 0.16), transparent 28%),
             linear-gradient(180deg, #050d12 0%, #0a171d 100%) !important;
         color: #eef3f7 !important;
     }
 
     .stApp {
         background:
-            radial-gradient(circle at top left, rgba(35, 95, 70, 0.18), transparent 28%),
+            radial-gradient(circle at top left, rgba(35, 95, 70, 0.16), transparent 28%),
             linear-gradient(180deg, #050d12 0%, #0a171d 100%) !important;
     }
 
     .block-container {
-        padding-top: 0.35rem !important;
-        padding-bottom: 0.15rem !important;
-        padding-left: 0.85rem !important;
-        padding-right: 0.85rem !important;
+        padding-top: 0.22rem !important;
+        padding-bottom: 0.06rem !important;
+        padding-left: 0.78rem !important;
+        padding-right: 0.78rem !important;
         max-width: 1450px !important;
     }
 
     div[data-testid="stVerticalBlock"] > div {
-        gap: 0.35rem !important;
+        gap: 0.22rem !important;
     }
 
     .premium-shell {
-        padding: 0.02rem 0.02rem 0.15rem 0.02rem;
+        padding: 0.01rem 0.01rem 0.08rem 0.01rem;
     }
 
     .premium-header {
         background: linear-gradient(135deg, rgba(20,48,39,0.96), rgba(17,38,31,0.96));
-        border: 1px solid rgba(120, 190, 155, 0.18);
-        border-radius: 20px;
-        padding: 12px 16px;
-        margin-bottom: 8px;
+        border: 1px solid rgba(120, 190, 155, 0.16);
+        border-radius: 18px;
+        padding: 10px 14px;
+        margin-bottom: 6px;
         box-shadow:
-            0 12px 24px rgba(0,0,0,0.24),
+            0 10px 22px rgba(0,0,0,0.22),
             inset 0 0 0 1px rgba(255,255,255,0.02);
     }
 
     .premium-card {
         background:
             linear-gradient(180deg, rgba(20,34,42,0.98), rgba(10,20,26,0.99));
-        border: 1px solid rgba(130, 188, 164, 0.13);
-        border-radius: 20px;
-        padding: 0.55rem 0.65rem 0.45rem 0.65rem;
+        border: 1px solid rgba(130, 188, 164, 0.12);
+        border-radius: 18px;
+        padding: 0.46rem 0.56rem 0.34rem 0.56rem;
         box-shadow:
             0 0 0 1px rgba(255,255,255,0.015) inset,
-            0 12px 24px rgba(0,0,0,0.26),
-            0 0 22px rgba(60,160,120,0.03);
-        margin-bottom: 0.32rem;
+            0 10px 22px rgba(0,0,0,0.24),
+            0 0 18px rgba(60,160,120,0.025);
+        margin-bottom: 0.20rem;
     }
 
     .premium-card-title {
-        font-size: 0.75rem;
+        font-size: 0.70rem;
         font-weight: 800;
         color: #f2f7fa;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        margin-bottom: 0.25rem;
-        padding-bottom: 0.18rem;
+        margin-bottom: 0.18rem;
+        padding-bottom: 0.14rem;
         border-bottom: 1px solid rgba(255,255,255,0.07);
     }
 
@@ -86,7 +86,7 @@ def premium_card_open(title):
                 display:flex;
                 justify-content:space-between;
                 align-items:center;
-                margin-bottom:4px;
+                margin-bottom:3px;
             ">
                 <div class="premium-card-title">{title}</div>
                 <div style="
@@ -144,40 +144,6 @@ def get_performance_context(detector_results=None):
     }
 
 
-def build_premium_gauge(score_value):
-    fig = go.Figure(
-        go.Indicator(
-            mode="gauge+number",
-            value=score_value,
-            number={"font": {"size": 30, "color": "#f5f7fa"}},
-            gauge={
-                "axis": {"range": [0, 100], "tickcolor": "#cfd8dc"},
-                "bar": {"color": "rgba(0,0,0,0)"},
-                "bgcolor": "#13252d",
-                "borderwidth": 0,
-                "steps": [
-                    {"range": [0, 35], "color": "#ff4d4d"},
-                    {"range": [35, 55], "color": "#ff8c42"},
-                    {"range": [55, 72], "color": "#ffd166"},
-                    {"range": [72, 100], "color": "#1ed760"},
-                ],
-                "threshold": {
-                    "line": {"color": "#f5f7fa", "width": 4},
-                    "thickness": 0.85,
-                    "value": score_value,
-                },
-            },
-        )
-    )
-    fig.update_layout(
-        height=155,
-        margin=dict(l=8, r=8, t=8, b=8),
-        paper_bgcolor="#13252d",
-        font={"color": "#e8f0f2"},
-    )
-    return fig
-
-
 def render_premium_distance_card():
     avg = 102.5
     reliable_min = 95
@@ -194,17 +160,17 @@ def render_premium_distance_card():
     <div style="
         color:#eef3f7;
         font-family:Arial, sans-serif;
-        padding-top:2px;
+        padding-top:1px;
     ">
         <div style="
             display:flex;
             justify-content:space-between;
             align-items:flex-start;
-            margin-bottom:10px;
+            margin-bottom:8px;
         ">
             <div>
                 <div style="
-                    font-size:32px;
+                    font-size:28px;
                     font-weight:800;
                     color:#f5f7fa;
                     line-height:0.95;
@@ -213,7 +179,7 @@ def render_premium_distance_card():
                     {avg:.1f}m
                 </div>
                 <div style="
-                    font-size:11px;
+                    font-size:10px;
                     color:#d7e5ea;
                     font-weight:700;
                     letter-spacing:0.06em;
@@ -225,7 +191,7 @@ def render_premium_distance_card():
 
             <div style="text-align:right;">
                 <div style="
-                    font-size:11px;
+                    font-size:10px;
                     color:#9fd9b4;
                     font-weight:700;
                     letter-spacing:0.05em;
@@ -235,7 +201,7 @@ def render_premium_distance_card():
                     Trust Window
                 </div>
                 <div style="
-                    font-size:18px;
+                    font-size:16px;
                     color:#f3fbf6;
                     font-weight:800;
                     line-height:1;
@@ -247,19 +213,19 @@ def render_premium_distance_card():
 
         <div style="
             position:relative;
-            height:20px;
+            height:18px;
             border-radius:999px;
             background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
             border:1px solid rgba(255,255,255,0.06);
             overflow:visible;
-            margin-top:6px;
-            margin-bottom:12px;
+            margin-top:4px;
+            margin-bottom:10px;
         ">
             <div style="
                 position:absolute;
                 left:{reliable_left:.2f}%;
                 width:{reliable_width:.2f}%;
-                height:20px;
+                height:18px;
                 top:0;
                 border-radius:999px;
                 background:linear-gradient(90deg, #169c4f, #1ed760);
@@ -270,8 +236,8 @@ def render_premium_distance_card():
                 position:absolute;
                 left:{avg_pos:.2f}%;
                 top:50%;
-                width:16px;
-                height:16px;
+                width:14px;
+                height:14px;
                 border-radius:50%;
                 background:#ff5a5a;
                 border:2px solid rgba(255,255,255,0.80);
@@ -284,17 +250,17 @@ def render_premium_distance_card():
             display:flex;
             justify-content:space-between;
             align-items:center;
-            margin-top:4px;
+            margin-top:2px;
         ">
             <div style="
-                font-size:11px;
+                font-size:10px;
                 color:#c7d4da;
                 font-weight:700;
             ">
                 {full_min:.0f}m
             </div>
             <div style="
-                font-size:10px;
+                font-size:9px;
                 color:#9fb8c2;
                 font-weight:700;
                 letter-spacing:0.08em;
@@ -303,7 +269,7 @@ def render_premium_distance_card():
                 Full Range
             </div>
             <div style="
-                font-size:11px;
+                font-size:10px;
                 color:#c7d4da;
                 font-weight:700;
             ">
@@ -313,8 +279,8 @@ def render_premium_distance_card():
 
         <div style="
             text-align:center;
-            margin-top:8px;
-            font-size:10px;
+            margin-top:7px;
+            font-size:9px;
             color:#c7d4da;
             line-height:1.2;
         ">
@@ -322,7 +288,7 @@ def render_premium_distance_card():
         </div>
     </div>
     """
-    components.html(html, height=150)
+    components.html(html, height=132)
 
 
 def render_premium_summary_card():
@@ -330,22 +296,22 @@ def render_premium_summary_card():
     <div style="
         color:#eef3f7;
         font-family:Arial, sans-serif;
-        padding-top:2px;
+        padding-top:1px;
     ">
         <div style="
             display:grid;
             grid-template-columns: 1fr 1fr;
-            gap:10px;
-            margin-bottom:10px;
+            gap:8px;
+            margin-bottom:8px;
         ">
             <div style="
                 background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
                 border:1px solid rgba(255,255,255,0.07);
-                border-radius:14px;
-                padding:10px 10px 8px 10px;
+                border-radius:12px;
+                padding:8px 8px 7px 8px;
             ">
                 <div style="
-                    font-size:10px;
+                    font-size:9px;
                     color:#c7d4da;
                     font-weight:700;
                     letter-spacing:0.06em;
@@ -355,7 +321,7 @@ def render_premium_summary_card():
                     Strike Quality
                 </div>
                 <div style="
-                    font-size:24px;
+                    font-size:22px;
                     color:#f5f7fa;
                     font-weight:800;
                     line-height:1;
@@ -364,7 +330,7 @@ def render_premium_summary_card():
                     65
                 </div>
                 <div style="
-                    font-size:11px;
+                    font-size:10px;
                     color:#1ed760;
                     font-weight:700;
                 ">
@@ -375,11 +341,11 @@ def render_premium_summary_card():
             <div style="
                 background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
                 border:1px solid rgba(255,255,255,0.07);
-                border-radius:14px;
-                padding:10px 10px 8px 10px;
+                border-radius:12px;
+                padding:8px 8px 7px 8px;
             ">
                 <div style="
-                    font-size:10px;
+                    font-size:9px;
                     color:#c7d4da;
                     font-weight:700;
                     letter-spacing:0.06em;
@@ -389,7 +355,7 @@ def render_premium_summary_card():
                     Blueprint
                 </div>
                 <div style="
-                    font-size:24px;
+                    font-size:22px;
                     color:#f5f7fa;
                     font-weight:800;
                     line-height:1;
@@ -398,7 +364,7 @@ def render_premium_summary_card():
                     52%
                 </div>
                 <div style="
-                    font-size:11px;
+                    font-size:10px;
                     color:#1ed760;
                     font-weight:700;
                 ">
@@ -409,11 +375,11 @@ def render_premium_summary_card():
             <div style="
                 background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
                 border:1px solid rgba(255,255,255,0.07);
-                border-radius:14px;
-                padding:10px 10px 8px 10px;
+                border-radius:12px;
+                padding:8px 8px 7px 8px;
             ">
                 <div style="
-                    font-size:10px;
+                    font-size:9px;
                     color:#c7d4da;
                     font-weight:700;
                     letter-spacing:0.06em;
@@ -423,7 +389,7 @@ def render_premium_summary_card():
                     Dispersion
                 </div>
                 <div style="
-                    font-size:24px;
+                    font-size:22px;
                     color:#f5f7fa;
                     font-weight:800;
                     line-height:1;
@@ -432,7 +398,7 @@ def render_premium_summary_card():
                     29
                 </div>
                 <div style="
-                    font-size:11px;
+                    font-size:10px;
                     color:#ff7f7f;
                     font-weight:700;
                 ">
@@ -443,11 +409,11 @@ def render_premium_summary_card():
             <div style="
                 background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
                 border:1px solid rgba(255,255,255,0.07);
-                border-radius:14px;
-                padding:10px 10px 8px 10px;
+                border-radius:12px;
+                padding:8px 8px 7px 8px;
             ">
                 <div style="
-                    font-size:10px;
+                    font-size:9px;
                     color:#c7d4da;
                     font-weight:700;
                     letter-spacing:0.06em;
@@ -457,7 +423,7 @@ def render_premium_summary_card():
                     Efficiency
                 </div>
                 <div style="
-                    font-size:24px;
+                    font-size:22px;
                     color:#f5f7fa;
                     font-weight:800;
                     line-height:1;
@@ -466,7 +432,7 @@ def render_premium_summary_card():
                     1.31
                 </div>
                 <div style="
-                    font-size:11px;
+                    font-size:10px;
                     color:#ffd166;
                     font-weight:700;
                 ">
@@ -482,11 +448,11 @@ def render_premium_summary_card():
             background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
             border:1px solid rgba(255,255,255,0.06);
             border-radius:12px;
-            padding:9px 10px;
+            padding:8px 9px;
         ">
             <div>
                 <div style="
-                    font-size:10px;
+                    font-size:9px;
                     color:#9fd9b4;
                     font-weight:700;
                     letter-spacing:0.06em;
@@ -496,7 +462,7 @@ def render_premium_summary_card():
                     Session Read
                 </div>
                 <div style="
-                    font-size:12px;
+                    font-size:11px;
                     color:#f3fbf6;
                     font-weight:700;
                     line-height:1.2;
@@ -507,64 +473,7 @@ def render_premium_summary_card():
         </div>
     </div>
     """
-    components.html(html, height=255)
-
-
-def build_progress_chart():
-    sessions = ["S1", "S2", "S3", "S4", "S5"]
-    performance = [52, 58, 61, 69, 78]
-    consistency = [36, 40, 44, 47, 53]
-
-    fig = go.Figure()
-
-    fig.add_trace(
-        go.Scatter(
-            x=sessions,
-            y=performance,
-            mode="lines+markers",
-            name="Performance",
-            line=dict(color="#1ed760", width=3),
-            marker=dict(size=7),
-        )
-    )
-
-    fig.add_trace(
-        go.Scatter(
-            x=sessions,
-            y=consistency,
-            mode="lines+markers",
-            name="Consistency",
-            line=dict(color="#ff8c42", width=3),
-            marker=dict(size=7),
-        )
-    )
-
-    fig.update_layout(
-        height=170,
-        margin=dict(l=4, r=4, t=8, b=4),
-        paper_bgcolor="#13252d",
-        plot_bgcolor="#0b1920",
-        font=dict(color="#e8f0f2"),
-        legend=dict(
-            orientation="h",
-            y=1.05,
-            x=0,
-            font=dict(size=10),
-        ),
-    )
-
-    fig.update_xaxes(
-        gridcolor="rgba(255,255,255,0.04)",
-        tickfont=dict(size=9),
-    )
-
-    fig.update_yaxes(
-        range=[30, 85],
-        gridcolor="rgba(255,255,255,0.05)",
-        tickfont=dict(size=9),
-    )
-
-    return fig
+    components.html(html, height=220)
 
 
 def render_premium_focus_card():
@@ -572,17 +481,17 @@ def render_premium_focus_card():
     <div style="
         color:#eef3f7;
         font-family:Arial, sans-serif;
-        padding-top:2px;
+        padding-top:1px;
     ">
         <div style="
             background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
             border:1px solid rgba(255,255,255,0.06);
-            border-radius:14px;
-            padding:10px 12px;
-            margin-bottom:10px;
+            border-radius:12px;
+            padding:8px 10px;
+            margin-bottom:8px;
         ">
             <div style="
-                font-size:10px;
+                font-size:9px;
                 color:#9fd9b4;
                 font-weight:700;
                 letter-spacing:0.06em;
@@ -592,10 +501,10 @@ def render_premium_focus_card():
                 Recommended Focus
             </div>
             <div style="
-                font-size:12px;
+                font-size:11px;
                 color:#f3fbf6;
                 font-weight:700;
-                line-height:1.35;
+                line-height:1.32;
             ">
                 • Neutral forearm setup<br>
                 • Pause at the top<br>
@@ -606,12 +515,12 @@ def render_premium_focus_card():
         <div style="
             background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
             border:1px solid rgba(255,255,255,0.06);
-            border-radius:14px;
-            padding:10px 12px;
-            margin-bottom:10px;
+            border-radius:12px;
+            padding:8px 10px;
+            margin-bottom:8px;
         ">
             <div style="
-                font-size:10px;
+                font-size:9px;
                 color:#9fd9b4;
                 font-weight:700;
                 letter-spacing:0.06em;
@@ -621,10 +530,10 @@ def render_premium_focus_card():
                 Practice Goal
             </div>
             <div style="
-                font-size:12px;
+                font-size:11px;
                 color:#f3fbf6;
                 font-weight:700;
-                line-height:1.3;
+                line-height:1.28;
             ">
                 Stabilise strike and low point control
             </div>
@@ -633,11 +542,11 @@ def render_premium_focus_card():
         <div style="
             background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
             border:1px solid rgba(255,255,255,0.06);
-            border-radius:14px;
-            padding:10px 12px;
+            border-radius:12px;
+            padding:8px 10px;
         ">
             <div style="
-                font-size:10px;
+                font-size:9px;
                 color:#9fd9b4;
                 font-weight:700;
                 letter-spacing:0.06em;
@@ -647,17 +556,166 @@ def render_premium_focus_card():
                 Primary Drill
             </div>
             <div style="
-                font-size:12px;
+                font-size:11px;
                 color:#f3fbf6;
                 font-weight:700;
-                line-height:1.3;
+                line-height:1.28;
             ">
                 Pause Transition Drill
             </div>
         </div>
     </div>
     """
-    components.html(html, height=255)
+    components.html(html, height=220)
+
+
+def render_performance_badge(performance):
+    score = performance["performance_score"]
+    label = performance["performance_label"]
+    trend_text = performance["trend_text"]
+    trend_color = performance["trend_color"]
+
+    html = f"""
+    <div style="
+        color:#eef3f7;
+        font-family:Arial, sans-serif;
+        padding-top:1px;
+    ">
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            margin-bottom:8px;
+        ">
+            <div>
+                <div style="
+                    font-size:34px;
+                    font-weight:800;
+                    color:#f5f7fa;
+                    line-height:0.95;
+                    margin-bottom:2px;
+                ">
+                    {score}
+                </div>
+                <div style="
+                    font-size:10px;
+                    color:#d7e5ea;
+                    font-weight:700;
+                    letter-spacing:0.06em;
+                    text-transform:uppercase;
+                ">
+                    {label}
+                </div>
+            </div>
+
+            <div style="
+                text-align:right;
+                font-size:10px;
+                color:{trend_color};
+                font-weight:700;
+                line-height:1.2;
+                margin-top:2px;
+            ">
+                {trend_text}
+            </div>
+        </div>
+
+        <div style="
+            background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+            border:1px solid rgba(255,255,255,0.06);
+            border-radius:999px;
+            overflow:hidden;
+            height:10px;
+            margin-bottom:10px;
+        ">
+            <div style="
+                width:{score}%;
+                height:10px;
+                background:linear-gradient(90deg, #169c4f, #1ed760);
+                box-shadow:0 0 10px rgba(30,215,96,0.22);
+            "></div>
+        </div>
+
+        <div style="
+            font-size:9px;
+            color:#c7d4da;
+            line-height:1.25;
+            text-align:center;
+        ">
+            Priority: {performance["primary_issue"]} · Next: {performance["secondary_issue"]}
+        </div>
+    </div>
+    """
+    components.html(html, height=140)
+
+
+def build_progress_chart():
+    sessions = ["S1", "S2", "S3", "S4", "S5"]
+    strike_quality = [48, 54, 57, 61, 65]
+    blueprint_match = [36, 40, 44, 48, 52]
+    dispersion_control = [32, 35, 37, 33, 29]
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x=sessions,
+            y=strike_quality,
+            mode="lines+markers",
+            name="Strike Quality",
+            line=dict(color="#1ed760", width=3),
+            marker=dict(size=7),
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=sessions,
+            y=blueprint_match,
+            mode="lines+markers",
+            name="Blueprint Match",
+            line=dict(color="#56a6ff", width=3),
+            marker=dict(size=7),
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=sessions,
+            y=dispersion_control,
+            mode="lines+markers",
+            name="Dispersion Control",
+            line=dict(color="#ff8c42", width=3),
+            marker=dict(size=7),
+        )
+    )
+
+    fig.update_layout(
+        height=150,
+        margin=dict(l=4, r=4, t=8, b=4),
+        paper_bgcolor="#13252d",
+        plot_bgcolor="#0b1920",
+        font=dict(color="#e8f0f2"),
+        legend=dict(
+            orientation="h",
+            y=1.08,
+            x=0,
+            font=dict(size=9),
+        ),
+    )
+
+    fig.update_xaxes(
+        gridcolor="rgba(255,255,255,0.04)",
+        tickfont=dict(size=9),
+    )
+
+    fig.update_yaxes(
+        range=[25, 70],
+        gridcolor="rgba(255,255,255,0.05)",
+        tickfont=dict(size=9),
+    )
+
+    return fig
 
 
 def build_premium_dispersion():
@@ -799,7 +857,7 @@ def build_premium_dispersion():
     fig.add_annotation(x=latest_x + 1.9, y=118.0, text="Latest Avg", showarrow=False, font=dict(color="#ffb1b1", size=10))
 
     fig.update_layout(
-        height=170,
+        height=156,
         margin=dict(l=4, r=4, t=8, b=4),
         paper_bgcolor="#13252d",
         plot_bgcolor="#0b1920",
@@ -841,7 +899,7 @@ def render_v4_dashboard_premium(detector_results=None):
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
                     <div style="
-                        font-size:18px;
+                        font-size:17px;
                         font-weight:800;
                         color:white;
                         line-height:1;
@@ -851,7 +909,7 @@ def render_v4_dashboard_premium(detector_results=None):
                         GolfAI
                     </div>
                     <div style="
-                        font-size:11px;
+                        font-size:10px;
                         font-weight:700;
                         color:#d8eee4;
                         letter-spacing:0.10em;
@@ -864,7 +922,7 @@ def render_v4_dashboard_premium(detector_results=None):
                         <div style="
                             background:rgba(255,255,255,0.08);
                             color:#e7fff2;
-                            font-size:10px;
+                            font-size:9px;
                             font-weight:700;
                             padding:4px 8px;
                             border-radius:999px;
@@ -872,14 +930,14 @@ def render_v4_dashboard_premium(detector_results=None):
                         ">
                             7 Iron
                         </div>
-                        <div style="color:#d8eee4; font-size:11px;">
+                        <div style="color:#d8eee4; font-size:10px;">
                             53 shots
                         </div>
                     </div>
                 </div>
                 <div style="text-align:right;">
                     <div style="
-                        font-size:10px;
+                        font-size:9px;
                         color:#bfe7d3;
                         letter-spacing:0.10em;
                         text-transform:uppercase;
@@ -889,7 +947,7 @@ def render_v4_dashboard_premium(detector_results=None):
                         Active Session
                     </div>
                     <div style="
-                        font-size:11px;
+                        font-size:10px;
                         color:#f3fbf6;
                         font-weight:700;
                         line-height:1.15;
@@ -903,50 +961,14 @@ def render_v4_dashboard_premium(detector_results=None):
         unsafe_allow_html=True,
     )
 
-    top_left, top_right = st.columns(2)
+    top_left, top_right = st.columns([1.18, 1.18])
 
     with top_left:
-        premium_card_open("Performance Score")
-        st.plotly_chart(
-            build_premium_gauge(performance["performance_score"]),
-            use_container_width=True,
-            config={"displayModeBar": False},
-        )
-        st.markdown(
-            f"""
-            <div style="
-                text-align:center;
-                margin-top:4px;
-                font-size:12px;
-                font-weight:700;
-                color:{performance["trend_color"]};
-                letter-spacing:0.02em;
-                line-height:1.1;
-            ">
-                {performance["trend_text"]} · {performance["performance_label"]}
-            </div>
-            <div style="
-                text-align:center;
-                margin-top:4px;
-                font-size:10px;
-                color:#c7d4da;
-                line-height:1.2;
-            ">
-                Priority: {performance["primary_issue"]} | Next: {performance["secondary_issue"]}
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        premium_card_close()
-
-    with top_right:
         premium_card_open("Carry Distance Profile")
         render_premium_distance_card()
         premium_card_close()
 
-    mid_left, mid_right = st.columns([1.18, 0.82])
-
-    with mid_left:
+    with top_right:
         premium_card_open("Shot Dispersion")
 
         st.markdown(
@@ -955,11 +977,11 @@ def render_v4_dashboard_premium(detector_results=None):
                 display:flex;
                 justify-content:space-between;
                 align-items:flex-start;
-                margin-bottom:4px;
+                margin-bottom:3px;
             ">
                 <div>
                     <div style="
-                        font-size:12px;
+                        font-size:11px;
                         color:#9fd9b4;
                         font-weight:700;
                         letter-spacing:0.04em;
@@ -969,7 +991,7 @@ def render_v4_dashboard_premium(detector_results=None):
                         Bias
                     </div>
                     <div style="
-                        font-size:18px;
+                        font-size:17px;
                         color:#f5f7fa;
                         font-weight:800;
                         line-height:1;
@@ -979,7 +1001,7 @@ def render_v4_dashboard_premium(detector_results=None):
                 </div>
                 <div style="text-align:right;">
                     <div style="
-                        font-size:12px;
+                        font-size:11px;
                         color:#c7d4da;
                         font-weight:700;
                         letter-spacing:0.04em;
@@ -989,7 +1011,7 @@ def render_v4_dashboard_premium(detector_results=None):
                         Width
                     </div>
                     <div style="
-                        font-size:18px;
+                        font-size:17px;
                         color:#f5f7fa;
                         font-weight:800;
                         line-height:1;
@@ -1012,8 +1034,8 @@ def render_v4_dashboard_premium(detector_results=None):
             """
             <div style="
                 text-align:center;
-                margin-top:3px;
-                font-size:10px;
+                margin-top:2px;
+                font-size:9px;
                 color:#c7d4da;
                 line-height:1.2;
             ">
@@ -1021,8 +1043,8 @@ def render_v4_dashboard_premium(detector_results=None):
             </div>
             <div style="
                 text-align:center;
-                margin-top:2px;
-                font-size:10px;
+                margin-top:1px;
+                font-size:9px;
                 color:#c7d4da;
                 line-height:1.2;
             ">
@@ -1034,14 +1056,14 @@ def render_v4_dashboard_premium(detector_results=None):
 
         premium_card_close()
 
-    with mid_right:
+    mid_left, mid_right = st.columns([1.00, 1.00])
+
+    with mid_left:
         premium_card_open("Session Summary")
         render_premium_summary_card()
         premium_card_close()
 
-    bottom_left, bottom_right = st.columns([1.18, 0.82])
-
-    with bottom_left:
+    with mid_right:
         premium_card_open("Progress Over Time")
         st.plotly_chart(
             build_progress_chart(),
@@ -1052,20 +1074,28 @@ def render_v4_dashboard_premium(detector_results=None):
             """
             <div style="
                 text-align:center;
-                margin-top:4px;
-                font-size:10px;
+                margin-top:3px;
+                font-size:9px;
                 color:#c7d4da;
+                line-height:1.2;
             ">
-                Performance improving across the last five sessions
+                Strike and blueprint are improving. Dispersion control still lags.
             </div>
             """,
             unsafe_allow_html=True,
         )
         premium_card_close()
 
-    with bottom_right:
+    bottom_left, bottom_right = st.columns([1.00, 1.00])
+
+    with bottom_left:
         premium_card_open("Practice Focus")
         render_premium_focus_card()
+        premium_card_close()
+
+    with bottom_right:
+        premium_card_open("Performance")
+        render_performance_badge(performance)
         premium_card_close()
 
     st.markdown("</div>", unsafe_allow_html=True)
