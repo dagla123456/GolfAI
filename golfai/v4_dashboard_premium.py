@@ -4,6 +4,10 @@ import plotly.graph_objects as go
 from golfai.scoring import build_session_score
 
 
+# ---------------------------------------------------
+# CSS
+# ---------------------------------------------------
+
 def get_premium_css():
     return """
     <style>
@@ -22,18 +26,18 @@ def get_premium_css():
 
     .block-container {
         padding-top: 0.22rem !important;
-        padding-bottom: 0.06rem !important;
+        padding-bottom: 0.04rem !important;
         padding-left: 0.78rem !important;
         padding-right: 0.78rem !important;
         max-width: 1450px !important;
     }
 
     div[data-testid="stVerticalBlock"] > div {
-        gap: 0.22rem !important;
+        gap: 0.20rem !important;
     }
 
     .premium-shell {
-        padding: 0.01rem 0.01rem 0.08rem 0.01rem;
+        padding: 0.01rem 0.01rem 0.06rem 0.01rem;
     }
 
     .premium-header {
@@ -52,12 +56,12 @@ def get_premium_css():
             linear-gradient(180deg, rgba(20,34,42,0.98), rgba(10,20,26,0.99));
         border: 1px solid rgba(130, 188, 164, 0.12);
         border-radius: 18px;
-        padding: 0.46rem 0.56rem 0.34rem 0.56rem;
+        padding: 0.44rem 0.54rem 0.34rem 0.54rem;
         box-shadow:
             0 0 0 1px rgba(255,255,255,0.015) inset,
             0 10px 22px rgba(0,0,0,0.24),
             0 0 18px rgba(60,160,120,0.025);
-        margin-bottom: 0.20rem;
+        margin-bottom: 0.18rem;
     }
 
     .premium-card-title {
@@ -66,8 +70,8 @@ def get_premium_css():
         color: #f2f7fa;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        margin-bottom: 0.18rem;
-        padding-bottom: 0.14rem;
+        margin-bottom: 0.16rem;
+        padding-bottom: 0.12rem;
         border-bottom: 1px solid rgba(255,255,255,0.07);
     }
 
@@ -77,6 +81,10 @@ def get_premium_css():
     </style>
     """
 
+
+# ---------------------------------------------------
+# HELPERS
+# ---------------------------------------------------
 
 def premium_card_open(title):
     st.markdown(
@@ -143,6 +151,47 @@ def get_performance_context(detector_results=None):
         "secondary_issue": secondary_issue,
     }
 
+
+# ---------------------------------------------------
+# MINI HEADER GAUGE
+# ---------------------------------------------------
+
+def build_mini_gauge(score):
+    fig = go.Figure(
+        go.Indicator(
+            mode="gauge",
+            value=score,
+            gauge={
+                "axis": {"range": [0, 100], "visible": False},
+                "bar": {"color": "rgba(0,0,0,0)"},
+                "bgcolor": "rgba(0,0,0,0)",
+                "borderwidth": 0,
+                "steps": [
+                    {"range": [0, 40], "color": "#ff4d4d"},
+                    {"range": [40, 65], "color": "#ffd166"},
+                    {"range": [65, 100], "color": "#1ed760"},
+                ],
+                "threshold": {
+                    "line": {"color": "white", "width": 3},
+                    "thickness": 0.85,
+                    "value": score,
+                },
+            },
+        )
+    )
+
+    fig.update_layout(
+        height=64,
+        margin=dict(l=0, r=0, t=0, b=0),
+        paper_bgcolor="rgba(0,0,0,0)",
+    )
+
+    return fig
+
+
+# ---------------------------------------------------
+# DISTANCE CARD
+# ---------------------------------------------------
 
 def render_premium_distance_card():
     avg = 102.5
@@ -291,6 +340,10 @@ def render_premium_distance_card():
     components.html(html, height=132)
 
 
+# ---------------------------------------------------
+# SESSION SUMMARY CARD
+# ---------------------------------------------------
+
 def render_premium_summary_card():
     html = """
     <div style="
@@ -317,25 +370,19 @@ def render_premium_summary_card():
                     letter-spacing:0.06em;
                     text-transform:uppercase;
                     margin-bottom:4px;
-                ">
-                    Strike Quality
-                </div>
+                ">Strike Quality</div>
                 <div style="
                     font-size:22px;
                     color:#f5f7fa;
                     font-weight:800;
                     line-height:1;
                     margin-bottom:4px;
-                ">
-                    65
-                </div>
+                ">65</div>
                 <div style="
                     font-size:10px;
                     color:#1ed760;
                     font-weight:700;
-                ">
-                    ▲ +6
-                </div>
+                ">▲ +6</div>
             </div>
 
             <div style="
@@ -351,25 +398,19 @@ def render_premium_summary_card():
                     letter-spacing:0.06em;
                     text-transform:uppercase;
                     margin-bottom:4px;
-                ">
-                    Blueprint
-                </div>
+                ">Blueprint</div>
                 <div style="
                     font-size:22px;
                     color:#f5f7fa;
                     font-weight:800;
                     line-height:1;
                     margin-bottom:4px;
-                ">
-                    52%
-                </div>
+                ">52%</div>
                 <div style="
                     font-size:10px;
                     color:#1ed760;
                     font-weight:700;
-                ">
-                    ▲ +7
-                </div>
+                ">▲ +7</div>
             </div>
 
             <div style="
@@ -385,25 +426,19 @@ def render_premium_summary_card():
                     letter-spacing:0.06em;
                     text-transform:uppercase;
                     margin-bottom:4px;
-                ">
-                    Dispersion
-                </div>
+                ">Dispersion</div>
                 <div style="
                     font-size:22px;
                     color:#f5f7fa;
                     font-weight:800;
                     line-height:1;
                     margin-bottom:4px;
-                ">
-                    29
-                </div>
+                ">29</div>
                 <div style="
                     font-size:10px;
                     color:#ff7f7f;
                     font-weight:700;
-                ">
-                    ▼ -4
-                </div>
+                ">▼ -4</div>
             </div>
 
             <div style="
@@ -419,62 +454,53 @@ def render_premium_summary_card():
                     letter-spacing:0.06em;
                     text-transform:uppercase;
                     margin-bottom:4px;
-                ">
-                    Efficiency
-                </div>
+                ">Efficiency</div>
                 <div style="
                     font-size:22px;
                     color:#f5f7fa;
                     font-weight:800;
                     line-height:1;
                     margin-bottom:4px;
-                ">
-                    1.31
-                </div>
+                ">1.31</div>
                 <div style="
                     font-size:10px;
                     color:#ffd166;
                     font-weight:700;
-                ">
-                    ● Stable
-                </div>
+                ">● Stable</div>
             </div>
         </div>
 
         <div style="
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
             background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
             border:1px solid rgba(255,255,255,0.06);
             border-radius:12px;
             padding:8px 9px;
         ">
-            <div>
-                <div style="
-                    font-size:9px;
-                    color:#9fd9b4;
-                    font-weight:700;
-                    letter-spacing:0.06em;
-                    text-transform:uppercase;
-                    margin-bottom:3px;
-                ">
-                    Session Read
-                </div>
-                <div style="
-                    font-size:11px;
-                    color:#f3fbf6;
-                    font-weight:700;
-                    line-height:1.2;
-                ">
-                    Contact improving. Start line still the key limiter.
-                </div>
+            <div style="
+                font-size:9px;
+                color:#9fd9b4;
+                font-weight:700;
+                letter-spacing:0.06em;
+                text-transform:uppercase;
+                margin-bottom:3px;
+            ">Session Read</div>
+            <div style="
+                font-size:11px;
+                color:#f3fbf6;
+                font-weight:700;
+                line-height:1.2;
+            ">
+                Contact improving. Start line still the key limiter.
             </div>
         </div>
     </div>
     """
     components.html(html, height=220)
 
+
+# ---------------------------------------------------
+# PRACTICE FOCUS CARD
+# ---------------------------------------------------
 
 def render_premium_focus_card():
     html = """
@@ -497,9 +523,7 @@ def render_premium_focus_card():
                 letter-spacing:0.06em;
                 text-transform:uppercase;
                 margin-bottom:4px;
-            ">
-                Recommended Focus
-            </div>
+            ">Recommended Focus</div>
             <div style="
                 font-size:11px;
                 color:#f3fbf6;
@@ -526,9 +550,7 @@ def render_premium_focus_card():
                 letter-spacing:0.06em;
                 text-transform:uppercase;
                 margin-bottom:4px;
-            ">
-                Practice Goal
-            </div>
+            ">Practice Goal</div>
             <div style="
                 font-size:11px;
                 color:#f3fbf6;
@@ -552,9 +574,7 @@ def render_premium_focus_card():
                 letter-spacing:0.06em;
                 text-transform:uppercase;
                 margin-bottom:4px;
-            ">
-                Primary Drill
-            </div>
+            ">Primary Drill</div>
             <div style="
                 font-size:11px;
                 color:#f3fbf6;
@@ -568,6 +588,10 @@ def render_premium_focus_card():
     """
     components.html(html, height=220)
 
+
+# ---------------------------------------------------
+# PERFORMANCE BADGE
+# ---------------------------------------------------
 
 def render_performance_badge(performance):
     score = performance["performance_score"]
@@ -649,6 +673,10 @@ def render_performance_badge(performance):
     components.html(html, height=140)
 
 
+# ---------------------------------------------------
+# PROGRESS CHART
+# ---------------------------------------------------
+
 def build_progress_chart():
     sessions = ["S1", "S2", "S3", "S4", "S5"]
     strike_quality = [48, 54, 57, 61, 65]
@@ -718,13 +746,16 @@ def build_progress_chart():
     return fig
 
 
+# ---------------------------------------------------
+# DISPERSION CHART
+# ---------------------------------------------------
+
 def build_premium_dispersion():
     shots_x = [-2.8, -1.5, -0.3, 0.8, 2.1, -1.2, 0.5, 1.6, -0.8, 2.8, -2.2, 0.2, 1.2, -1.9, 2.4]
     shots_y = [104, 108, 111, 109, 105, 114, 116, 113, 118, 107, 110, 112, 109, 111, 114]
 
     latest_x = 0.4
     latest_y = 110.5
-
     trend_x = -0.6
     trend_y = 109.4
 
@@ -887,80 +918,96 @@ def build_premium_dispersion():
     return fig
 
 
+# ---------------------------------------------------
+# MAIN DASHBOARD
+# ---------------------------------------------------
+
 def render_v4_dashboard_premium(detector_results=None):
     performance = get_performance_context(detector_results)
 
     st.markdown(get_premium_css(), unsafe_allow_html=True)
     st.markdown('<div class="premium-shell">', unsafe_allow_html=True)
 
-    st.markdown(
-        """
-        <div class="premium-header">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <div style="
-                        font-size:17px;
-                        font-weight:800;
-                        color:white;
-                        line-height:1;
-                        margin-bottom:4px;
-                        letter-spacing:0.03em;
-                    ">
-                        GolfAI
-                    </div>
-                    <div style="
-                        font-size:10px;
-                        font-weight:700;
-                        color:#d8eee4;
-                        letter-spacing:0.10em;
-                        text-transform:uppercase;
-                        margin-bottom:4px;
-                    ">
-                        Command Centre
-                    </div>
-                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+    # HEADER
+    header_left, header_right = st.columns([5, 1])
+
+    with header_left:
+        st.markdown(
+            """
+            <div class="premium-header">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
                         <div style="
-                            background:rgba(255,255,255,0.08);
-                            color:#e7fff2;
-                            font-size:9px;
-                            font-weight:700;
-                            padding:4px 8px;
-                            border-radius:999px;
-                            border:1px solid rgba(255,255,255,0.06);
+                            font-size:17px;
+                            font-weight:800;
+                            color:white;
+                            line-height:1;
+                            margin-bottom:4px;
+                            letter-spacing:0.03em;
                         ">
-                            7 Iron
+                            GolfAI
                         </div>
-                        <div style="color:#d8eee4; font-size:10px;">
-                            53 shots
+                        <div style="
+                            font-size:10px;
+                            font-weight:700;
+                            color:#d8eee4;
+                            letter-spacing:0.10em;
+                            text-transform:uppercase;
+                            margin-bottom:4px;
+                        ">
+                            Command Centre
                         </div>
-                    </div>
-                </div>
-                <div style="text-align:right;">
-                    <div style="
-                        font-size:9px;
-                        color:#bfe7d3;
-                        letter-spacing:0.10em;
-                        text-transform:uppercase;
-                        font-weight:700;
-                        margin-bottom:3px;
-                    ">
-                        Active Session
-                    </div>
-                    <div style="
-                        font-size:10px;
-                        color:#f3fbf6;
-                        font-weight:700;
-                        line-height:1.15;
-                    ">
-                        mlm2pro_shotexport_011826.csv
+                        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                            <div style="
+                                background:rgba(255,255,255,0.08);
+                                color:#e7fff2;
+                                font-size:9px;
+                                font-weight:700;
+                                padding:4px 8px;
+                                border-radius:999px;
+                                border:1px solid rgba(255,255,255,0.06);
+                            ">
+                                7 Iron
+                            </div>
+                            <div style="color:#d8eee4; font-size:10px;">
+                                53 shots
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+            """,
+            unsafe_allow_html=True,
+        )
 
+    with header_right:
+        gauge_col, menu_col = st.columns([3, 1])
+
+        with gauge_col:
+            st.plotly_chart(
+                build_mini_gauge(performance["performance_score"]),
+                use_container_width=True,
+                config={"displayModeBar": False},
+            )
+
+        with menu_col:
+            st.markdown(
+                """
+                <div style="
+                    display:flex;
+                    justify-content:center;
+                    align-items:center;
+                    height:64px;
+                    font-size:22px;
+                    color:#e6f2ef;
+                ">
+                    ☰
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+    # ROW 1
     top_left, top_right = st.columns([1.18, 1.18])
 
     with top_left:
@@ -1056,6 +1103,7 @@ def render_v4_dashboard_premium(detector_results=None):
 
         premium_card_close()
 
+    # ROW 2
     mid_left, mid_right = st.columns([1.00, 1.00])
 
     with mid_left:
@@ -1086,6 +1134,7 @@ def render_v4_dashboard_premium(detector_results=None):
         )
         premium_card_close()
 
+    # ROW 3
     bottom_left, bottom_right = st.columns([1.00, 1.00])
 
     with bottom_left:
