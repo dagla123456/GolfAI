@@ -177,6 +177,149 @@ def build_premium_gauge(score_value):
     return fig
 
 
+def render_premium_distance_card():
+    avg = 102.5
+    reliable_min = 95
+    reliable_max = 113
+    full_min = 72
+    full_max = 132
+    spread = full_max - full_min
+
+    avg_pos = (avg - full_min) / spread * 100
+    reliable_left = (reliable_min - full_min) / spread * 100
+    reliable_width = (reliable_max - reliable_min) / spread * 100
+
+    st.markdown(
+        f"""
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            margin-bottom:10px;
+        ">
+            <div>
+                <div style="
+                    font-size:32px;
+                    font-weight:800;
+                    color:#f5f7fa;
+                    line-height:0.95;
+                    margin-bottom:2px;
+                ">
+                    {avg:.1f}m
+                </div>
+                <div style="
+                    font-size:11px;
+                    color:#d7e5ea;
+                    font-weight:700;
+                    letter-spacing:0.06em;
+                    text-transform:uppercase;
+                ">
+                    Average Carry
+                </div>
+            </div>
+
+            <div style="text-align:right;">
+                <div style="
+                    font-size:11px;
+                    color:#9fd9b4;
+                    font-weight:700;
+                    letter-spacing:0.05em;
+                    text-transform:uppercase;
+                    margin-bottom:2px;
+                ">
+                    Trust Window
+                </div>
+                <div style="
+                    font-size:18px;
+                    color:#f3fbf6;
+                    font-weight:800;
+                    line-height:1;
+                ">
+                    {reliable_min:.0f}–{reliable_max:.0f}m
+                </div>
+            </div>
+        </div>
+
+        <div style="
+            position:relative;
+            height:20px;
+            border-radius:999px;
+            background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+            border:1px solid rgba(255,255,255,0.06);
+            overflow:visible;
+            margin-top:6px;
+            margin-bottom:12px;
+        ">
+            <div style="
+                position:absolute;
+                left:{reliable_left:.2f}%;
+                width:{reliable_width:.2f}%;
+                height:20px;
+                top:0;
+                border-radius:999px;
+                background:linear-gradient(90deg, #169c4f, #1ed760);
+                box-shadow:0 0 12px rgba(30,215,96,0.22);
+            "></div>
+
+            <div style="
+                position:absolute;
+                left:{avg_pos:.2f}%;
+                top:50%;
+                width:16px;
+                height:16px;
+                border-radius:50%;
+                background:#ff5a5a;
+                border:2px solid rgba(255,255,255,0.80);
+                transform:translate(-50%, -50%);
+                box-shadow:0 0 10px rgba(255,90,90,0.40);
+            "></div>
+        </div>
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-top:4px;
+        ">
+            <div style="
+                font-size:11px;
+                color:#c7d4da;
+                font-weight:700;
+            ">
+                {full_min:.0f}m
+            </div>
+            <div style="
+                font-size:10px;
+                color:#9fb8c2;
+                font-weight:700;
+                letter-spacing:0.08em;
+                text-transform:uppercase;
+            ">
+                Full Range
+            </div>
+            <div style="
+                font-size:11px;
+                color:#c7d4da;
+                font-weight:700;
+            ">
+                {full_max:.0f}m
+            </div>
+        </div>
+
+        <div style="
+            text-align:center;
+            margin-top:8px;
+            font-size:10px;
+            color:#c7d4da;
+            line-height:1.2;
+        ">
+            Reliable carry is clustering inside the green corridor
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def build_premium_dispersion():
     shots_x = [-2.8, -1.5, -0.3, 0.8, 2.1, -1.2, 0.5, 1.6, -0.8, 2.8, -2.2, 0.2, 1.2, -1.9, 2.4]
     shots_y = [104, 108, 111, 109, 105, 114, 116, 113, 118, 107, 110, 112, 109, 111, 114]
@@ -192,7 +335,6 @@ def build_premium_dispersion():
 
     fig = go.Figure()
 
-    # field background
     fig.add_hrect(
         y0=98,
         y1=122,
@@ -201,7 +343,6 @@ def build_premium_dispersion():
         layer="below",
     )
 
-    # target corridor
     fig.add_vrect(
         x0=-3.2,
         x1=3.2,
@@ -218,7 +359,6 @@ def build_premium_dispersion():
         layer="below",
     )
 
-    # target line
     fig.add_vline(
         x=0,
         line_width=2.2,
@@ -226,8 +366,6 @@ def build_premium_dispersion():
         line_color="rgba(255,255,255,0.54)",
     )
 
-    # one single dispersion ellipse
-    
     fig.add_trace(
         go.Scatter(
             x=ellipse_x,
@@ -240,8 +378,7 @@ def build_premium_dispersion():
             showlegend=False,
         )
     )
-    
-    # shot glow layer
+
     fig.add_trace(
         go.Scatter(
             x=shots_x,
@@ -257,7 +394,6 @@ def build_premium_dispersion():
         )
     )
 
-    # main shots
     fig.add_trace(
         go.Scatter(
             x=shots_x,
@@ -273,7 +409,6 @@ def build_premium_dispersion():
         )
     )
 
-    # rolling average glow
     fig.add_trace(
         go.Scatter(
             x=[trend_x],
@@ -289,7 +424,6 @@ def build_premium_dispersion():
         )
     )
 
-    # rolling average marker - blue circle
     fig.add_trace(
         go.Scatter(
             x=[trend_x],
@@ -306,7 +440,6 @@ def build_premium_dispersion():
         )
     )
 
-    # latest average glow
     fig.add_trace(
         go.Scatter(
             x=[latest_x],
@@ -322,7 +455,6 @@ def build_premium_dispersion():
         )
     )
 
-    # latest average marker - red diamond
     fig.add_trace(
         go.Scatter(
             x=[latest_x],
@@ -339,7 +471,6 @@ def build_premium_dispersion():
         )
     )
 
-    # chart labels placed safely inside chart
     fig.add_annotation(
         x=0,
         y=120.7,
@@ -506,6 +637,14 @@ def render_v4_dashboard_premium(detector_results=None):
         premium_card_close()
 
     with top_right:
+        premium_card_open("Carry Distance Profile")
+        render_premium_distance_card()
+        premium_card_close()
+
+    st.markdown("<div style='height: 2px;'></div>", unsafe_allow_html=True)
+
+    full_width = st.columns([1])[0]
+    with full_width:
         premium_card_open("Shot Dispersion")
 
         st.markdown(
