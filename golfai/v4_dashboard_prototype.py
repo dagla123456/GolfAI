@@ -264,6 +264,20 @@ def render_v4_dashboard_prototype():
     with top_left:
         card_open("Performance Score")
         st.plotly_chart(build_mock_gauge(), use_container_width=True, config={"displayModeBar": False})
+
+        st.markdown("""
+        <div style="
+            display:flex;
+            justify-content:center;
+            margin-top:2px;
+            font-size:12px;
+            font-weight:700;
+            color:#1ed760;
+            letter-spacing:0.02em;
+        ">
+        ▲ Improving
+            </div>
+        """, unsafe_allow_html=True)
         card_close()
     with top_right:
         card_open("Carry Distance Profile")
