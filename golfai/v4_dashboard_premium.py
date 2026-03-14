@@ -189,135 +189,133 @@ def render_premium_distance_card():
     reliable_left = (reliable_min - full_min) / spread * 100
     reliable_width = (reliable_max - reliable_min) / spread * 100
 
-    st.markdown(
-        f"""
-        <div style="
-            display:flex;
-            justify-content:space-between;
-            align-items:flex-start;
-            margin-bottom:10px;
-        ">
-            <div>
-                <div style="
-                    font-size:32px;
-                    font-weight:800;
-                    color:#f5f7fa;
-                    line-height:0.95;
-                    margin-bottom:2px;
-                ">
-                    {avg:.1f}m
-                </div>
-                <div style="
-                    font-size:11px;
-                    color:#d7e5ea;
-                    font-weight:700;
-                    letter-spacing:0.06em;
-                    text-transform:uppercase;
-                ">
-                    Average Carry
-                </div>
-            </div>
-
-            <div style="text-align:right;">
-                <div style="
-                    font-size:11px;
-                    color:#9fd9b4;
-                    font-weight:700;
-                    letter-spacing:0.05em;
-                    text-transform:uppercase;
-                    margin-bottom:2px;
-                ">
-                    Trust Window
-                </div>
-                <div style="
-                    font-size:18px;
-                    color:#f3fbf6;
-                    font-weight:800;
-                    line-height:1;
-                ">
-                    {reliable_min:.0f}–{reliable_max:.0f}m
-                </div>
-            </div>
-        </div>
-
-        <div style="
-            position:relative;
-            height:20px;
-            border-radius:999px;
-            background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-            border:1px solid rgba(255,255,255,0.06);
-            overflow:visible;
-            margin-top:6px;
-            margin-bottom:12px;
-        ">
+    html = f"""
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        margin-bottom:10px;
+    ">
+        <div>
             <div style="
-                position:absolute;
-                left:{reliable_left:.2f}%;
-                width:{reliable_width:.2f}%;
-                height:20px;
-                top:0;
-                border-radius:999px;
-                background:linear-gradient(90deg, #169c4f, #1ed760);
-                box-shadow:0 0 12px rgba(30,215,96,0.22);
-            "></div>
-
-            <div style="
-                position:absolute;
-                left:{avg_pos:.2f}%;
-                top:50%;
-                width:16px;
-                height:16px;
-                border-radius:50%;
-                background:#ff5a5a;
-                border:2px solid rgba(255,255,255,0.80);
-                transform:translate(-50%, -50%);
-                box-shadow:0 0 10px rgba(255,90,90,0.40);
-            "></div>
-        </div>
-
-        <div style="
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-top:4px;
-        ">
+                font-size:32px;
+                font-weight:800;
+                color:#f5f7fa;
+                line-height:0.95;
+                margin-bottom:2px;
+            ">
+                {avg:.1f}m
+            </div>
             <div style="
                 font-size:11px;
-                color:#c7d4da;
+                color:#d7e5ea;
                 font-weight:700;
-            ">
-                {full_min:.0f}m
-            </div>
-            <div style="
-                font-size:10px;
-                color:#9fb8c2;
-                font-weight:700;
-                letter-spacing:0.08em;
+                letter-spacing:0.06em;
                 text-transform:uppercase;
             ">
-                Full Range
-            </div>
-            <div style="
-                font-size:11px;
-                color:#c7d4da;
-                font-weight:700;
-            ">
-                {full_max:.0f}m
+                Average Carry
             </div>
         </div>
 
-        <div style="
-            text-align:center;
-            margin-top:8px;
-            font-size:10px;
-            color:#c7d4da;
-            line-height:1.2;
-        ">
-            Reliable carry is clustering inside the green corridor
+        <div style="text-align:right;">
+            <div style="
+                font-size:11px;
+                color:#9fd9b4;
+                font-weight:700;
+                letter-spacing:0.05em;
+                text-transform:uppercase;
+                margin-bottom:2px;
+            ">
+                Trust Window
+            </div>
+            <div style="
+                font-size:18px;
+                color:#f3fbf6;
+                font-weight:800;
+                line-height:1;
+            ">
+                {reliable_min:.0f}–{reliable_max:.0f}m
+            </div>
         </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    </div>
+
+    <div style="
+        position:relative;
+        height:20px;
+        border-radius:999px;
+        background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+        border:1px solid rgba(255,255,255,0.06);
+        overflow:visible;
+        margin-top:6px;
+        margin-bottom:12px;
+    ">
+        <div style="
+            position:absolute;
+            left:{reliable_left:.2f}%;
+            width:{reliable_width:.2f}%;
+            height:20px;
+            top:0;
+            border-radius:999px;
+            background:linear-gradient(90deg, #169c4f, #1ed760);
+            box-shadow:0 0 12px rgba(30,215,96,0.22);
+        "></div>
+
+        <div style="
+            position:absolute;
+            left:{avg_pos:.2f}%;
+            top:50%;
+            width:16px;
+            height:16px;
+            border-radius:50%;
+            background:#ff5a5a;
+            border:2px solid rgba(255,255,255,0.80);
+            transform:translate(-50%, -50%);
+            box-shadow:0 0 10px rgba(255,90,90,0.40);
+        "></div>
+    </div>
+
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-top:4px;
+    ">
+        <div style="
+            font-size:11px;
+            color:#c7d4da;
+            font-weight:700;
+        ">
+            {full_min:.0f}m
+        </div>
+        <div style="
+            font-size:10px;
+            color:#9fb8c2;
+            font-weight:700;
+            letter-spacing:0.08em;
+            text-transform:uppercase;
+        ">
+            Full Range
+        </div>
+        <div style="
+            font-size:11px;
+            color:#c7d4da;
+            font-weight:700;
+        ">
+            {full_max:.0f}m
+        </div>
+    </div>
+
+    <div style="
+        text-align:center;
+        margin-top:8px;
+        font-size:10px;
+        color:#c7d4da;
+        line-height:1.2;
+    ">
+        Reliable carry is clustering inside the green corridor
+    </div>
+    """
+    st.markdown(html, unsafe_allow_html=True)
 
 
 def build_premium_dispersion():
