@@ -26,9 +26,10 @@ def get_performance_context(detector_results=None):
         trend_text = "▲ Improving"
         trend_color = "#1ed760"
     elif performance_score >= 50:
-        performance_label = "Developing"
+        performance_label = "● Mixed session"
         trend_text = "● Mixed session"
         trend_color = "#ffd166"
+        performance_label = "Developing"
     else:
         performance_label = "Needs Work"
         trend_text = "▼ Below standard"
@@ -142,7 +143,7 @@ def build_mock_distance():
             zeroline=False,
             tickmode="array",
             tickvals=[full_min, reliable_min, reliable_max, full_max],
-            ticktext=[f"{full_min}m", f"{reliable_min}", f"{reliable_max}", f"{full_max}m"],
+            ticktext=[f"{full_min}m", f"{reliable_min}m", f"{reliable_max}m", f"{full_max}m"],
             tickfont=dict(size=10, color="#cfd8dc"),
             fixedrange=True,
         ),
@@ -151,108 +152,181 @@ def build_mock_distance():
     return fig
 
 
-def build_mock_dispersion():
-    fig = go.Figure()
-
-    fig.add_hrect(y0=98, y1=122, fillcolor="rgba(255,255,255,0.015)", line_width=0, layer="below")
-    fig.add_vrect(x0=-5, x1=5, fillcolor="rgba(110,200,120,0.18)", line_width=0, layer="below")
-    fig.add_vline(x=0, line_width=2.0, line_dash="dash", line_color="rgba(255,255,255,0.55)")
-    fig.add_hline(y=110.5, line_width=1.4, line_color="rgba(255,255,255,0.35)")
-
-    ex1 = [-8, -4, 0, 4, 8, 7, 3, -1, -5, -7, -5, -1, 3, 6, 4, 0, -3, -6, -8]
-    ey1 = [116, 121, 124, 121, 116, 110, 105, 103, 105, 110, 116, 121, 124, 121, 116, 112, 110, 112, 116]
-    fig.add_trace(
-        go.Scatter(
-            x=ex1,
-            y=ey1,
-            mode="lines",
-            line=dict(color="rgba(255,255,255,0.82)", width=2.2),
-            fill="toself",
-            fillcolor="rgba(130,210,100,0.14)",
-            hoverinfo="skip",
-            showlegend=False,
-        )
-    )
-
-    ex2 = [-5, -2, 0, 2, 5, 4, 2, -1, -3, -4, -3, -1, 2, 4, 3, 0, -2, -4, -5]
-    ey2 = [113, 116, 118, 116, 113, 110, 108, 107, 108, 110, 113, 116, 118, 116, 113, 111, 110, 111, 113]
-    fig.add_trace(
-        go.Scatter(
-            x=ex2,
-            y=ey2,
-            mode="lines",
-            line=dict(color="rgba(120,255,150,0.28)", width=1.1),
-            fill="toself",
-            fillcolor="rgba(120,255,150,0.10)",
-            hoverinfo="skip",
-            showlegend=False,
-        )
-    )
-
+def build_pro_dispersion():
     shots_x = [-2.8, -1.5, -0.3, 0.8, 2.1, -1.2, 0.5, 1.6, -0.8, 2.8, -2.2, 0.2, 1.2, -1.9, 2.4]
     shots_y = [104, 108, 111, 109, 105, 114, 116, 113, 118, 107, 110, 112, 109, 111, 114]
+
+    centroid_x = 0.4
+    centroid_y = 110.5
+
+    outer_x = [-8, -4, 0, 4, 8, 7, 3, -1, -5, -7, -5, -1, 3, 6, 4, 0, -3, -6, -8]
+    outer_y = [116, 121, 124, 121, 116, 110, 105, 103, 105, 110, 116, 121, 124, 121, 116, 112, 110, 112, 116]
+
+    inner_x = [-5, -2, 0, 2, 5, 4, 2, -1, -3, -4, -3, -1, 2, 4, 3, 0, -2, -4, -5]
+    inner_y = [113, 116, 118, 116, 113, 110, 108, 107, 108, 110, 113, 116, 118, 116, 113, 111, 110, 111, 113]
+
+    fig = go.Figure()
+
+    # background field bands
+    fig.add_hrect(
+        y0=98, y1=122,
+        fillcolor="rgba(255,255,255,0.012)",
+        line_width=0,
+        layer="below"
+    )
+
+    # target corridor
+    fig.add_vrect(
+        x0=-3.5, x1=3.5,
+        fillcolor="rgba(42, 199, 121, 0.12)",
+        line_width=0,
+        layer="below"
+    )
+
+    # wider corridor glow
+    fig.add_vrect(
+        x0=-6.0, x1=6.0,
+        fillcolor="rgba(42, 199, 121, 0.05)",
+        line_width=0,
+        layer="below"
+    )
+
+    # center target line
+    fig.add_vline(
+        x=0,
+        line_width=2.2,
+        line_dash="dash",
+        line_color="rgba(255,255,255,0.52)"
+    )
+
+    # average carry line
+    fig.add_hline(
+        y=centroid_y,
+        line_width=1.2,
+        line_color="rgba(255,255,255,0.22)"
+    )
+
+    # outer dispersion zone
+    fig.add_trace(
+        go.Scatter(
+            x=outer_x,
+            y=outer_y,
+            mode="lines",
+            line=dict(color="rgba(255,255,255,0.70)", width=2.0),
+            fill="toself",
+            fillcolor="rgba(120, 255, 170, 0.08)",
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+
+    # inner cluster zone
+    fig.add_trace(
+        go.Scatter(
+            x=inner_x,
+            y=inner_y,
+            mode="lines",
+            line=dict(color="rgba(140,255,190,0.30)", width=1.2),
+            fill="toself",
+            fillcolor="rgba(90, 255, 170, 0.12)",
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+
+    # shot glow layer
     fig.add_trace(
         go.Scatter(
             x=shots_x,
             y=shots_y,
             mode="markers",
             marker=dict(
-                size=7,
-                color="rgba(240,245,210,0.96)",
-                line=dict(width=0.8, color="rgba(30,30,30,0.35)"),
+                size=16,
+                color="rgba(142, 255, 196, 0.10)",
+                line=dict(width=0),
             ),
-            showlegend=False,
-        )
-    )
-
-    fig.add_trace(
-        go.Scatter(
-            x=[0.4],
-            y=[110.5],
-            mode="markers",
-            marker=dict(size=20, color="rgba(255,70,70,0.18)"),
             hoverinfo="skip",
             showlegend=False,
         )
     )
+
+    # main shot markers
     fig.add_trace(
         go.Scatter(
-            x=[0.4],
-            y=[110.5],
+            x=shots_x,
+            y=shots_y,
             mode="markers",
             marker=dict(
-                size=11,
-                color="rgba(255,70,70,1)",
-                symbol="diamond",
-                line=dict(width=1.0, color="rgba(255,255,255,0.55)"),
+                size=8,
+                color="rgba(229, 255, 236, 0.98)",
+                line=dict(width=0.9, color="rgba(80,120,100,0.40)"),
             ),
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+
+    # centroid glow
+    fig.add_trace(
+        go.Scatter(
+            x=[centroid_x],
+            y=[centroid_y],
+            mode="markers",
+            marker=dict(
+                size=28,
+                color="rgba(255, 79, 79, 0.16)",
+                line=dict(width=0),
+            ),
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+
+    # centroid marker
+    fig.add_trace(
+        go.Scatter(
+            x=[centroid_x],
+            y=[centroid_y],
+            mode="markers",
+            marker=dict(
+                size=12,
+                color="rgba(255, 88, 88, 1)",
+                symbol="diamond",
+                line=dict(width=1.2, color="rgba(255,255,255,0.70)"),
+            ),
+            hoverinfo="skip",
             showlegend=False,
         )
     )
 
     fig.update_layout(
-        height=155,
+        height=145,
         margin=dict(l=4, r=4, t=4, b=4),
         paper_bgcolor="#142c34",
-        plot_bgcolor="#0f1f26",
+        plot_bgcolor="#0d1c23",
         font=dict(color="#e8f0f2"),
     )
+
     fig.update_xaxes(
         title="Side Carry (m)",
         range=[-12, 12],
-        gridcolor="rgba(255,255,255,0.08)",
+        gridcolor="rgba(255,255,255,0.06)",
         zeroline=False,
         tickfont=dict(size=9),
         title_font=dict(size=10),
+        fixedrange=True,
     )
+
     fig.update_yaxes(
         title="Carry Distance (m)",
         range=[98, 122],
-        gridcolor="rgba(255,255,255,0.08)",
+        gridcolor="rgba(255,255,255,0.06)",
         zeroline=False,
         tickfont=dict(size=9),
         title_font=dict(size=10),
+        fixedrange=True,
     )
+
     return fig
 
 
@@ -469,7 +543,83 @@ def render_v4_dashboard_prototype(detector_results=None):
     middle_left, middle_right = st.columns([1.05, 0.95])
     with middle_left:
         card_open("Shot Dispersion")
-        st.plotly_chart(build_mock_dispersion(), use_container_width=True, config={"displayModeBar": False})
+
+        st.markdown(
+            """
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:flex-start;
+                margin-bottom:4px;
+            ">
+                <div>
+                    <div style="
+                        font-size:12px;
+                        color:#9fd9b4;
+                        font-weight:700;
+                        letter-spacing:0.04em;
+                        text-transform:uppercase;
+                        margin-bottom:2px;
+                    ">
+                        Bias
+                    </div>
+                    <div style="
+                        font-size:18px;
+                        color:#f5f7fa;
+                        font-weight:800;
+                        line-height:1;
+                    ">
+                        Slight Left
+                    </div>
+                </div>
+                <div style="
+                    text-align:right;
+                ">
+                    <div style="
+                        font-size:12px;
+                        color:#c7d4da;
+                        font-weight:700;
+                        letter-spacing:0.04em;
+                        text-transform:uppercase;
+                        margin-bottom:2px;
+                    ">
+                        Width
+                    </div>
+                    <div style="
+                        font-size:18px;
+                        color:#f5f7fa;
+                        font-weight:800;
+                        line-height:1;
+                    ">
+                        8.4m
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        st.plotly_chart(
+            build_pro_dispersion(),
+            use_container_width=True,
+            config={"displayModeBar": False},
+        )
+
+        st.markdown(
+            """
+            <div style="
+                text-align:center;
+                margin-top:3px;
+                font-size:10px;
+                color:#c7d4da;
+                line-height:1.2;
+            ">
+                Pattern: Slight left bias · Strike grouping improving
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
         card_close()
 
     with middle_right:
