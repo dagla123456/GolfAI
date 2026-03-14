@@ -49,7 +49,7 @@ def build_mock_gauge(score_value):
         go.Indicator(
             mode="gauge+number",
             value=score_value,
-            number={"font": {"size": 24, "color": "#f5f7fa"}},
+            number={"font": {"size": 26, "color": "#f5f7fa"}},
             gauge={
                 "axis": {"range": [0, 100], "tickcolor": "#cfd8dc"},
                 "bar": {"color": "rgba(0,0,0,0)"},
@@ -70,8 +70,8 @@ def build_mock_gauge(score_value):
         )
     )
     fig.update_layout(
-        height=125,
-        margin=dict(l=8, r=8, t=8, b=8),
+        height=140,
+        margin=dict(l=8, r=8, t=10, b=8),
         paper_bgcolor="#142c34",
         font={"color": "#e8f0f2"},
     )
@@ -340,66 +340,27 @@ def render_v4_dashboard_prototype(detector_results=None):
     top_left, top_right = st.columns(2)
     with top_left:
         card_open("Performance Score")
-
-        score = performance["performance_score"]
-        label = performance["performance_label"]
-        trend_text = performance["trend_text"]
-        trend_color = performance["trend_color"]
-
-        st.markdown(
-            f"""
-            <div style="
-                display:flex;
-                justify-content:space-between;
-                align-items:flex-start;
-                margin-bottom:6px;
-            ">
-                <div>
-                    <div style="
-                        font-size:34px;
-                        font-weight:800;
-                        color:#f5f7fa;
-                        line-height:0.95;
-                        margin-bottom:2px;
-                    ">
-                        {score}
-                    </div>
-                    <div style="
-                        font-size:12px;
-                        color:#d7e5ea;
-                        font-weight:700;
-                        letter-spacing:0.03em;
-                        text-transform:uppercase;
-                    ">
-                        {label}
-                    </div>
-                </div>
-                <div style="
-                    text-align:right;
-                    font-size:11px;
-                    color:{trend_color};
-                    font-weight:700;
-                    line-height:1.2;
-                    margin-top:2px;
-                ">
-                    {trend_text}
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
         st.plotly_chart(
-            build_mock_gauge(score),
+            build_mock_gauge(performance["performance_score"]),
             use_container_width=True,
             config={"displayModeBar": False},
         )
-
         st.markdown(
             f"""
             <div style="
                 text-align:center;
-                margin-top:3px;
+                margin-top:4px;
+                font-size:12px;
+                font-weight:700;
+                color:{performance["trend_color"]};
+                letter-spacing:0.02em;
+                line-height:1.1;
+            ">
+                {performance["trend_text"]} · {performance["performance_label"]}
+            </div>
+            <div style="
+                text-align:center;
+                margin-top:4px;
                 font-size:10px;
                 color:#c7d4da;
                 line-height:1.2;
@@ -409,7 +370,6 @@ def render_v4_dashboard_prototype(detector_results=None):
             """,
             unsafe_allow_html=True,
         )
-
         card_close()
 
     with top_right:
