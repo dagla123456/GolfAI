@@ -70,11 +70,6 @@ def get_premium_css():
         border-bottom: 1px solid rgba(255,255,255,0.07);
     }
 
-    .premium-muted {
-        color: #aebec7;
-        font-size: 0.74rem;
-    }
-
     .js-plotly-plot, .plot-container {
         height: 100% !important;
     }
@@ -225,12 +220,6 @@ def build_premium_dispersion():
         line_color="rgba(255,255,255,0.54)"
     )
 
-    fig.add_hline(
-        y=centroid_y,
-        line_width=1.1,
-        line_color="rgba(255,255,255,0.18)"
-    )
-
     fig.add_trace(
         go.Scatter(
             x=outer_x,
@@ -263,8 +252,8 @@ def build_premium_dispersion():
             y=shots_y,
             mode="markers",
             marker=dict(
-                size=16,
-                color="rgba(130,255,190,0.10)",
+                size=18,
+                color="rgba(130,255,190,0.11)",
                 line=dict(width=0),
             ),
             hoverinfo="skip",
@@ -278,9 +267,9 @@ def build_premium_dispersion():
             y=shots_y,
             mode="markers",
             marker=dict(
-                size=8,
-                color="rgba(236,255,241,0.98)",
-                line=dict(width=0.9, color="rgba(80,120,100,0.40)"),
+                size=8.5,
+                color="rgba(242,255,246,0.99)",
+                line=dict(width=0.9, color="rgba(80,120,100,0.35)"),
             ),
             hoverinfo="skip",
             showlegend=False,
@@ -316,6 +305,14 @@ def build_premium_dispersion():
             hoverinfo="skip",
             showlegend=False,
         )
+    )
+
+    fig.add_annotation(
+        x=0,
+        y=121.3,
+        text="Target Line",
+        showarrow=False,
+        font=dict(color="#cfe0e6", size=10),
     )
 
     fig.update_layout(
