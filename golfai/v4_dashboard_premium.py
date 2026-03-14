@@ -325,6 +325,191 @@ def render_premium_distance_card():
     components.html(html, height=150)
 
 
+def render_premium_summary_card():
+    html = """
+    <div style="
+        color:#eef3f7;
+        font-family:Arial, sans-serif;
+        padding-top:2px;
+    ">
+        <div style="
+            display:grid;
+            grid-template-columns: 1fr 1fr;
+            gap:10px;
+            margin-bottom:10px;
+        ">
+            <div style="
+                background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+                border:1px solid rgba(255,255,255,0.07);
+                border-radius:14px;
+                padding:10px 10px 8px 10px;
+            ">
+                <div style="
+                    font-size:10px;
+                    color:#c7d4da;
+                    font-weight:700;
+                    letter-spacing:0.06em;
+                    text-transform:uppercase;
+                    margin-bottom:4px;
+                ">
+                    Strike Quality
+                </div>
+                <div style="
+                    font-size:24px;
+                    color:#f5f7fa;
+                    font-weight:800;
+                    line-height:1;
+                    margin-bottom:4px;
+                ">
+                    65
+                </div>
+                <div style="
+                    font-size:11px;
+                    color:#1ed760;
+                    font-weight:700;
+                ">
+                    ▲ +6
+                </div>
+            </div>
+
+            <div style="
+                background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+                border:1px solid rgba(255,255,255,0.07);
+                border-radius:14px;
+                padding:10px 10px 8px 10px;
+            ">
+                <div style="
+                    font-size:10px;
+                    color:#c7d4da;
+                    font-weight:700;
+                    letter-spacing:0.06em;
+                    text-transform:uppercase;
+                    margin-bottom:4px;
+                ">
+                    Blueprint
+                </div>
+                <div style="
+                    font-size:24px;
+                    color:#f5f7fa;
+                    font-weight:800;
+                    line-height:1;
+                    margin-bottom:4px;
+                ">
+                    52%
+                </div>
+                <div style="
+                    font-size:11px;
+                    color:#1ed760;
+                    font-weight:700;
+                ">
+                    ▲ +7
+                </div>
+            </div>
+
+            <div style="
+                background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+                border:1px solid rgba(255,255,255,0.07);
+                border-radius:14px;
+                padding:10px 10px 8px 10px;
+            ">
+                <div style="
+                    font-size:10px;
+                    color:#c7d4da;
+                    font-weight:700;
+                    letter-spacing:0.06em;
+                    text-transform:uppercase;
+                    margin-bottom:4px;
+                ">
+                    Dispersion
+                </div>
+                <div style="
+                    font-size:24px;
+                    color:#f5f7fa;
+                    font-weight:800;
+                    line-height:1;
+                    margin-bottom:4px;
+                ">
+                    29
+                </div>
+                <div style="
+                    font-size:11px;
+                    color:#ff7f7f;
+                    font-weight:700;
+                ">
+                    ▼ -4
+                </div>
+            </div>
+
+            <div style="
+                background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+                border:1px solid rgba(255,255,255,0.07);
+                border-radius:14px;
+                padding:10px 10px 8px 10px;
+            ">
+                <div style="
+                    font-size:10px;
+                    color:#c7d4da;
+                    font-weight:700;
+                    letter-spacing:0.06em;
+                    text-transform:uppercase;
+                    margin-bottom:4px;
+                ">
+                    Efficiency
+                </div>
+                <div style="
+                    font-size:24px;
+                    color:#f5f7fa;
+                    font-weight:800;
+                    line-height:1;
+                    margin-bottom:4px;
+                ">
+                    1.31
+                </div>
+                <div style="
+                    font-size:11px;
+                    color:#ffd166;
+                    font-weight:700;
+                ">
+                    ● Stable
+                </div>
+            </div>
+        </div>
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+            border:1px solid rgba(255,255,255,0.06);
+            border-radius:12px;
+            padding:9px 10px;
+        ">
+            <div>
+                <div style="
+                    font-size:10px;
+                    color:#9fd9b4;
+                    font-weight:700;
+                    letter-spacing:0.06em;
+                    text-transform:uppercase;
+                    margin-bottom:3px;
+                ">
+                    Session Read
+                </div>
+                <div style="
+                    font-size:12px;
+                    color:#f3fbf6;
+                    font-weight:700;
+                    line-height:1.2;
+                ">
+                    Contact improving. Start line still the key limiter.
+                </div>
+            </div>
+        </div>
+    </div>
+    """
+    components.html(html, height=255)
+
+
 def build_premium_dispersion():
     shots_x = [-2.8, -1.5, -0.3, 0.8, 2.1, -1.2, 0.5, 1.6, -0.8, 2.8, -2.2, 0.2, 1.2, -1.9, 2.4]
     shots_y = [104, 108, 111, 109, 105, 114, 116, 113, 118, 107, 110, 112, 109, 111, 114]
@@ -340,24 +525,19 @@ def build_premium_dispersion():
 
     fig = go.Figure()
 
-    # dark field zones
     fig.add_hrect(y0=98, y1=122, fillcolor="rgba(255,255,255,0.010)", line_width=0, layer="below")
     fig.add_hrect(y0=105, y1=115.5, fillcolor="rgba(255,255,255,0.018)", line_width=0, layer="below")
 
-    # target corridor
     fig.add_vrect(x0=-2.8, x1=2.8, fillcolor="rgba(42,199,121,0.14)", line_width=0, layer="below")
     fig.add_vrect(x0=-5.2, x1=5.2, fillcolor="rgba(42,199,121,0.05)", line_width=0, layer="below")
 
-    # subtle field grid
     for x in [-8, -4, 4, 8]:
         fig.add_vline(x=x, line_width=0.8, line_color="rgba(255,255,255,0.04)")
     for y in [102, 106, 110, 114, 118]:
         fig.add_hline(y=y, line_width=0.8, line_color="rgba(255,255,255,0.035)")
 
-    # target line
     fig.add_vline(x=0, line_width=2.4, line_dash="dash", line_color="rgba(255,255,255,0.58)")
 
-    # soft dispersion zone
     fig.add_trace(
         go.Scatter(
             x=ellipse_x,
@@ -371,7 +551,6 @@ def build_premium_dispersion():
         )
     )
 
-    # soft inner density glow
     fig.add_trace(
         go.Scatter(
             x=[-4.2, -2.0, 0.0, 2.4, 4.0, 3.0, 1.0, -1.4, -3.2, -4.2],
@@ -385,23 +564,17 @@ def build_premium_dispersion():
         )
     )
 
-    # shot glow
     fig.add_trace(
         go.Scatter(
             x=shots_x,
             y=shots_y,
             mode="markers",
-            marker=dict(
-                size=20,
-                color="rgba(130,255,190,0.11)",
-                line=dict(width=0),
-            ),
+            marker=dict(size=20, color="rgba(130,255,190,0.11)", line=dict(width=0)),
             hoverinfo="skip",
             showlegend=False,
         )
     )
 
-    # shot markers
     fig.add_trace(
         go.Scatter(
             x=shots_x,
@@ -417,7 +590,6 @@ def build_premium_dispersion():
         )
     )
 
-    # rolling average glow
     fig.add_trace(
         go.Scatter(
             x=[trend_x],
@@ -429,7 +601,6 @@ def build_premium_dispersion():
         )
     )
 
-    # rolling average marker
     fig.add_trace(
         go.Scatter(
             x=[trend_x],
@@ -446,7 +617,6 @@ def build_premium_dispersion():
         )
     )
 
-    # latest average glow
     fig.add_trace(
         go.Scatter(
             x=[latest_x],
@@ -458,7 +628,6 @@ def build_premium_dispersion():
         )
     )
 
-    # latest average marker
     fig.add_trace(
         go.Scatter(
             x=[latest_x],
@@ -475,29 +644,9 @@ def build_premium_dispersion():
         )
     )
 
-    fig.add_annotation(
-        x=0,
-        y=120.4,
-        text="Target Line",
-        showarrow=False,
-        font=dict(color="#cfe0e6", size=10),
-    )
-
-    fig.add_annotation(
-        x=trend_x - 0.4,
-        y=119.0,
-        text="Last 5 Avg",
-        showarrow=False,
-        font=dict(color="#9fd1ff", size=10),
-    )
-
-    fig.add_annotation(
-        x=latest_x + 1.9,
-        y=118.0,
-        text="Latest Avg",
-        showarrow=False,
-        font=dict(color="#ffb1b1", size=10),
-    )
+    fig.add_annotation(x=0, y=120.4, text="Target Line", showarrow=False, font=dict(color="#cfe0e6", size=10))
+    fig.add_annotation(x=trend_x - 0.4, y=119.0, text="Last 5 Avg", showarrow=False, font=dict(color="#9fd1ff", size=10))
+    fig.add_annotation(x=latest_x + 1.9, y=118.0, text="Latest Avg", showarrow=False, font=dict(color="#ffb1b1", size=10))
 
     fig.update_layout(
         height=170,
@@ -645,10 +794,9 @@ def render_v4_dashboard_premium(detector_results=None):
         render_premium_distance_card()
         premium_card_close()
 
-    st.markdown("<div style='height: 2px;'></div>", unsafe_allow_html=True)
+    mid_left, mid_right = st.columns([1.18, 0.82])
 
-    full_width = st.columns([1])[0]
-    with full_width:
+    with mid_left:
         premium_card_open("Shot Dispersion")
 
         st.markdown(
@@ -734,6 +882,11 @@ def render_v4_dashboard_premium(detector_results=None):
             unsafe_allow_html=True,
         )
 
+        premium_card_close()
+
+    with mid_right:
+        premium_card_open("Session Summary")
+        render_premium_summary_card()
         premium_card_close()
 
     st.markdown("</div>", unsafe_allow_html=True)
