@@ -115,27 +115,13 @@ def build_mock_distance():
             marker=dict(
                 size=14,
                 color="rgba(255,90,90,1)",
-                line=dict(width=2, color="rgba(255,255,255,0.80)")
+                line=dict(width=2, color="rgba(255,255,255,0.80)"),
             ),
             showlegend=False,
             hoverinfo="skip",
         )
     )
 
-    fig.add_annotation(
-        x=avg,
-        y=0.84,
-        text="AVG",
-        showarrow=False,
-        font=dict(color="#ffb3b3", size=10),
-    )
-    fig.add_annotation(
-        x=avg,
-        y=0.76,
-        text=f"{avg:.1f}m",
-        showarrow=False,
-        font=dict(color="#ffffff", size=15),
-    )
     fig.add_annotation(
         x=(reliable_min + reliable_max) / 2,
         y=0.18,
