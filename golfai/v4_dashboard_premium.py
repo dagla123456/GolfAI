@@ -510,6 +510,156 @@ def render_premium_summary_card():
     components.html(html, height=255)
 
 
+def build_progress_chart():
+    sessions = ["S1", "S2", "S3", "S4", "S5"]
+    performance = [52, 58, 61, 69, 78]
+    consistency = [36, 40, 44, 47, 53]
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x=sessions,
+            y=performance,
+            mode="lines+markers",
+            name="Performance",
+            line=dict(color="#1ed760", width=3),
+            marker=dict(size=7),
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=sessions,
+            y=consistency,
+            mode="lines+markers",
+            name="Consistency",
+            line=dict(color="#ff8c42", width=3),
+            marker=dict(size=7),
+        )
+    )
+
+    fig.update_layout(
+        height=170,
+        margin=dict(l=4, r=4, t=8, b=4),
+        paper_bgcolor="#13252d",
+        plot_bgcolor="#0b1920",
+        font=dict(color="#e8f0f2"),
+        legend=dict(
+            orientation="h",
+            y=1.05,
+            x=0,
+            font=dict(size=10),
+        ),
+    )
+
+    fig.update_xaxes(
+        gridcolor="rgba(255,255,255,0.04)",
+        tickfont=dict(size=9),
+    )
+
+    fig.update_yaxes(
+        range=[30, 85],
+        gridcolor="rgba(255,255,255,0.05)",
+        tickfont=dict(size=9),
+    )
+
+    return fig
+
+
+def render_premium_focus_card():
+    html = """
+    <div style="
+        color:#eef3f7;
+        font-family:Arial, sans-serif;
+        padding-top:2px;
+    ">
+        <div style="
+            background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+            border:1px solid rgba(255,255,255,0.06);
+            border-radius:14px;
+            padding:10px 12px;
+            margin-bottom:10px;
+        ">
+            <div style="
+                font-size:10px;
+                color:#9fd9b4;
+                font-weight:700;
+                letter-spacing:0.06em;
+                text-transform:uppercase;
+                margin-bottom:4px;
+            ">
+                Recommended Focus
+            </div>
+            <div style="
+                font-size:12px;
+                color:#f3fbf6;
+                font-weight:700;
+                line-height:1.35;
+            ">
+                • Neutral forearm setup<br>
+                • Pause at the top<br>
+                • Arms fall before chest rotates
+            </div>
+        </div>
+
+        <div style="
+            background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+            border:1px solid rgba(255,255,255,0.06);
+            border-radius:14px;
+            padding:10px 12px;
+            margin-bottom:10px;
+        ">
+            <div style="
+                font-size:10px;
+                color:#9fd9b4;
+                font-weight:700;
+                letter-spacing:0.06em;
+                text-transform:uppercase;
+                margin-bottom:4px;
+            ">
+                Practice Goal
+            </div>
+            <div style="
+                font-size:12px;
+                color:#f3fbf6;
+                font-weight:700;
+                line-height:1.3;
+            ">
+                Stabilise strike and low point control
+            </div>
+        </div>
+
+        <div style="
+            background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+            border:1px solid rgba(255,255,255,0.06);
+            border-radius:14px;
+            padding:10px 12px;
+        ">
+            <div style="
+                font-size:10px;
+                color:#9fd9b4;
+                font-weight:700;
+                letter-spacing:0.06em;
+                text-transform:uppercase;
+                margin-bottom:4px;
+            ">
+                Primary Drill
+            </div>
+            <div style="
+                font-size:12px;
+                color:#f3fbf6;
+                font-weight:700;
+                line-height:1.3;
+            ">
+                Pause Transition Drill
+            </div>
+        </div>
+    </div>
+    """
+    components.html(html, height=255)
+
+
 def build_premium_dispersion():
     shots_x = [-2.8, -1.5, -0.3, 0.8, 2.1, -1.2, 0.5, 1.6, -0.8, 2.8, -2.2, 0.2, 1.2, -1.9, 2.4]
     shots_y = [104, 108, 111, 109, 105, 114, 116, 113, 118, 107, 110, 112, 109, 111, 114]
@@ -678,62 +828,6 @@ def build_premium_dispersion():
 
     return fig
 
-def build_progress_chart():
-
-    sessions = ["S1","S2","S3","S4","S5"]
-    performance = [52,58,61,69,78]
-    consistency = [36,40,44,47,53]
-
-    fig = go.Figure()
-
-    fig.add_trace(
-        go.Scatter(
-            x=sessions,
-            y=performance,
-            mode="lines+markers",
-            name="Performance",
-            line=dict(color="#1ed760", width=3),
-            marker=dict(size=7)
-        )
-    )
-
-    fig.add_trace(
-        go.Scatter(
-            x=sessions,
-            y=consistency,
-            mode="lines+markers",
-            name="Consistency",
-            line=dict(color="#ff8c42", width=3),
-            marker=dict(size=7)
-        )
-    )
-
-    fig.update_layout(
-        height=170,
-        margin=dict(l=4,r=4,t=8,b=4),
-        paper_bgcolor="#13252d",
-        plot_bgcolor="#0b1920",
-        font=dict(color="#e8f0f2"),
-        legend=dict(
-            orientation="h",
-            y=1.05,
-            x=0,
-            font=dict(size=10)
-        )
-    )
-
-    fig.update_xaxes(
-        gridcolor="rgba(255,255,255,0.04)",
-        tickfont=dict(size=9)
-    )
-
-    fig.update_yaxes(
-        range=[30,85],
-        gridcolor="rgba(255,255,255,0.05)",
-        tickfont=dict(size=9)
-    )
-
-    return fig
 
 def render_v4_dashboard_premium(detector_results=None):
     performance = get_performance_context(detector_results)
@@ -943,6 +1037,35 @@ def render_v4_dashboard_premium(detector_results=None):
     with mid_right:
         premium_card_open("Session Summary")
         render_premium_summary_card()
+        premium_card_close()
+
+    bottom_left, bottom_right = st.columns([1.18, 0.82])
+
+    with bottom_left:
+        premium_card_open("Progress Over Time")
+        st.plotly_chart(
+            build_progress_chart(),
+            use_container_width=True,
+            config={"displayModeBar": False},
+        )
+        st.markdown(
+            """
+            <div style="
+                text-align:center;
+                margin-top:4px;
+                font-size:10px;
+                color:#c7d4da;
+            ">
+                Performance improving across the last five sessions
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        premium_card_close()
+
+    with bottom_right:
+        premium_card_open("Practice Focus")
+        render_premium_focus_card()
         premium_card_close()
 
     st.markdown("</div>", unsafe_allow_html=True)
