@@ -102,3 +102,31 @@ def get_v4_css():
     }
     </style>
     """
+    BASE_LAYOUT_FIX = """
+<style>
+
+/* reduce overall page padding */
+.block-container {
+    padding-top: 0.5rem;
+    padding-bottom: 0rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* tighten vertical spacing */
+div[data-testid="stVerticalBlock"] > div {
+    gap: 0.5rem;
+}
+
+/* reduce panel padding */
+.panel {
+    padding: 8px;
+}
+
+/* reduce chart height */
+.js-plotly-plot {
+    height: 180px !important;
+}
+
+</style>
+"""
