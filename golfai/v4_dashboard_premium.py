@@ -678,6 +678,62 @@ def build_premium_dispersion():
 
     return fig
 
+def build_progress_chart():
+
+    sessions = ["S1","S2","S3","S4","S5"]
+    performance = [52,58,61,69,78]
+    consistency = [36,40,44,47,53]
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x=sessions,
+            y=performance,
+            mode="lines+markers",
+            name="Performance",
+            line=dict(color="#1ed760", width=3),
+            marker=dict(size=7)
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=sessions,
+            y=consistency,
+            mode="lines+markers",
+            name="Consistency",
+            line=dict(color="#ff8c42", width=3),
+            marker=dict(size=7)
+        )
+    )
+
+    fig.update_layout(
+        height=170,
+        margin=dict(l=4,r=4,t=8,b=4),
+        paper_bgcolor="#13252d",
+        plot_bgcolor="#0b1920",
+        font=dict(color="#e8f0f2"),
+        legend=dict(
+            orientation="h",
+            y=1.05,
+            x=0,
+            font=dict(size=10)
+        )
+    )
+
+    fig.update_xaxes(
+        gridcolor="rgba(255,255,255,0.04)",
+        tickfont=dict(size=9)
+    )
+
+    fig.update_yaxes(
+        range=[30,85],
+        gridcolor="rgba(255,255,255,0.05)",
+        tickfont=dict(size=9)
+    )
+
+    return fig
 
 def render_v4_dashboard_premium(detector_results=None):
     performance = get_performance_context(detector_results)
