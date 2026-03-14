@@ -1,16 +1,16 @@
 """
 GolfAI Streamlit App
-Version: v1.2
+Version: v2.0
 
 Change Summary:
-- Replaces sidebar navigation with top mode switch
-- Improves mobile usability
-- Keeps Command Centre and On Course modes
+- Switches Command Centre to the new premium dashboard build
+- Keeps On Course mode
+- Preserves top mode switch for tablet-friendly use
 """
 
 import streamlit as st
 
-from golfai.v4_dashboard_prototype import render_v4_dashboard_prototype
+from golfai.v4_dashboard_premium import render_v4_dashboard_premium
 from golfai.oncourse_ui import oncourse_page
 
 st.set_page_config(
@@ -56,6 +56,6 @@ mode = st.radio(
 )
 
 if mode == "Command Centre":
-    render_v4_dashboard_prototype()
+    render_v4_dashboard_premium()
 else:
     oncourse_page()
