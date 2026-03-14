@@ -181,71 +181,66 @@ def build_premium_dispersion():
     shots_x = [-2.8, -1.5, -0.3, 0.8, 2.1, -1.2, 0.5, 1.6, -0.8, 2.8, -2.2, 0.2, 1.2, -1.9, 2.4]
     shots_y = [104, 108, 111, 109, 105, 114, 116, 113, 118, 107, 110, 112, 109, 111, 114]
 
-    centroid_x = 0.4
-    centroid_y = 110.5
+    latest_x = 0.4
+    latest_y = 110.5
 
-    outer_x = [-8, -4, 0, 4, 8, 7, 3, -1, -5, -7, -5, -1, 3, 6, 4, 0, -3, -6, -8]
-    outer_y = [116, 121, 124, 121, 116, 110, 105, 103, 105, 110, 116, 121, 124, 121, 116, 112, 110, 112, 116]
+    trend_x = -0.6
+    trend_y = 109.4
 
-    inner_x = [-5, -2, 0, 2, 5, 4, 2, -1, -3, -4, -3, -1, 2, 4, 3, 0, -2, -4, -5]
-    inner_y = [113, 116, 118, 116, 113, 110, 108, 107, 108, 110, 113, 116, 118, 116, 113, 111, 110, 111, 113]
+    ellipse_x = [-6.8, -3.8, -1.2, 1.8, 4.8, 5.8, 4.2, 1.5, -1.8, -4.8, -6.0, -5.4, -3.0, 0.0, 2.8, 4.8, 3.2, 0.4, -2.8, -5.8, -6.8]
+    ellipse_y = [115.8, 119.2, 120.8, 120.3, 117.2, 112.0, 107.6, 105.2, 104.8, 106.0, 109.2, 113.4, 117.2, 118.8, 118.0, 115.2, 111.0, 108.2, 107.2, 110.0, 115.8]
 
     fig = go.Figure()
 
+    # field background
     fig.add_hrect(
-        y0=98, y1=122,
+        y0=98,
+        y1=122,
         fillcolor="rgba(255,255,255,0.012)",
         line_width=0,
-        layer="below"
+        layer="below",
+    )
+
+    # target corridor
+    fig.add_vrect(
+        x0=-3.2,
+        x1=3.2,
+        fillcolor="rgba(42,199,121,0.12)",
+        line_width=0,
+        layer="below",
     )
 
     fig.add_vrect(
-        x0=-3.5, x1=3.5,
-        fillcolor="rgba(42, 199, 121, 0.12)",
+        x0=-5.5,
+        x1=5.5,
+        fillcolor="rgba(42,199,121,0.05)",
         line_width=0,
-        layer="below"
+        layer="below",
     )
 
-    fig.add_vrect(
-        x0=-6.0, x1=6.0,
-        fillcolor="rgba(42, 199, 121, 0.05)",
-        line_width=0,
-        layer="below"
-    )
-
+    # target line
     fig.add_vline(
         x=0,
-        line_width=2.3,
+        line_width=2.2,
         line_dash="dash",
-        line_color="rgba(255,255,255,0.54)"
+        line_color="rgba(255,255,255,0.54)",
     )
 
+    # one single dispersion ellipse
     fig.add_trace(
         go.Scatter(
-            x=outer_x,
-            y=outer_y,
+            x=ellipse_x,
+            y=ellipse_y,
             mode="lines",
-            line=dict(color="rgba(255,255,255,0.74)", width=2.1),
+            line=dict(color="rgba(255,255,255,0.72)", width=2.0),
             fill="toself",
-            fillcolor="rgba(120,255,170,0.08)",
+            fillcolor="rgba(120,255,170,0.09)",
             hoverinfo="skip",
             showlegend=False,
         )
     )
 
-    fig.add_trace(
-        go.Scatter(
-            x=inner_x,
-            y=inner_y,
-            mode="lines",
-            line=dict(color="rgba(140,255,190,0.34)", width=1.2),
-            fill="toself",
-            fillcolor="rgba(90,255,170,0.13)",
-            hoverinfo="skip",
-            showlegend=False,
-        )
-    )
-
+    # shot glow layer
     fig.add_trace(
         go.Scatter(
             x=shots_x,
@@ -261,6 +256,7 @@ def build_premium_dispersion():
         )
     )
 
+    # main shots
     fig.add_trace(
         go.Scatter(
             x=shots_x,
@@ -276,13 +272,47 @@ def build_premium_dispersion():
         )
     )
 
+    # rolling average glow
     fig.add_trace(
         go.Scatter(
-            x=[centroid_x],
-            y=[centroid_y],
+            x=[trend_x],
+            y=[trend_y],
             mode="markers",
             marker=dict(
-                size=30,
+                size=24,
+                color="rgba(86,174,255,0.16)",
+                line=dict(width=0),
+            ),
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+
+    # rolling average marker - blue circle
+    fig.add_trace(
+        go.Scatter(
+            x=[trend_x],
+            y=[trend_y],
+            mode="markers",
+            marker=dict(
+                size=11,
+                color="rgba(82,166,255,1)",
+                symbol="circle",
+                line=dict(width=1.2, color="rgba(255,255,255,0.78)"),
+            ),
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+
+    # latest average glow
+    fig.add_trace(
+        go.Scatter(
+            x=[latest_x],
+            y=[latest_y],
+            mode="markers",
+            marker=dict(
+                size=28,
                 color="rgba(255,79,79,0.15)",
                 line=dict(width=0),
             ),
@@ -291,10 +321,11 @@ def build_premium_dispersion():
         )
     )
 
+    # latest average marker - red diamond
     fig.add_trace(
         go.Scatter(
-            x=[centroid_x],
-            y=[centroid_y],
+            x=[latest_x],
+            y=[latest_y],
             mode="markers",
             marker=dict(
                 size=12,
@@ -307,17 +338,34 @@ def build_premium_dispersion():
         )
     )
 
+    # chart labels placed safely inside chart
     fig.add_annotation(
         x=0,
-        y=121.3,
+        y=120.7,
         text="Target Line",
         showarrow=False,
         font=dict(color="#cfe0e6", size=10),
     )
 
+    fig.add_annotation(
+        x=trend_x,
+        y=121.2,
+        text="Last 5 Avg",
+        showarrow=False,
+        font=dict(color="#9fd1ff", size=10),
+    )
+
+    fig.add_annotation(
+        x=latest_x + 1.4,
+        y=119.9,
+        text="Latest Avg",
+        showarrow=False,
+        font=dict(color="#ffb1b1", size=10),
+    )
+
     fig.update_layout(
-        height=155,
-        margin=dict(l=4, r=4, t=4, b=4),
+        height=162,
+        margin=dict(l=4, r=4, t=8, b=4),
         paper_bgcolor="#13252d",
         plot_bgcolor="#0c1b22",
         font=dict(color="#e8f0f2"),
@@ -527,7 +575,16 @@ def render_v4_dashboard_premium(detector_results=None):
                 color:#c7d4da;
                 line-height:1.2;
             ">
-                Pattern: Slight left bias · Strike grouping improving
+                Red = latest session average · Blue = last 5 sessions average
+            </div>
+            <div style="
+                text-align:center;
+                margin-top:2px;
+                font-size:10px;
+                color:#c7d4da;
+                line-height:1.2;
+            ">
+                Today is moving 1.0m closer to centre than recent trend
             </div>
             """,
             unsafe_allow_html=True,
