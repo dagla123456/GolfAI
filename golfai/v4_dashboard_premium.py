@@ -322,7 +322,6 @@ def render_premium_distance_card():
         </div>
     </div>
     """
-
     components.html(html, height=150)
 
 
@@ -341,11 +340,24 @@ def build_premium_dispersion():
 
     fig = go.Figure()
 
-    fig.add_hrect(y0=98, y1=122, fillcolor="rgba(255,255,255,0.012)", line_width=0, layer="below")
-    fig.add_vrect(x0=-3.2, x1=3.2, fillcolor="rgba(42,199,121,0.12)", line_width=0, layer="below")
-    fig.add_vrect(x0=-5.5, x1=5.5, fillcolor="rgba(42,199,121,0.05)", line_width=0, layer="below")
-    fig.add_vline(x=0, line_width=2.2, line_dash="dash", line_color="rgba(255,255,255,0.54)")
+    # dark field zones
+    fig.add_hrect(y0=98, y1=122, fillcolor="rgba(255,255,255,0.010)", line_width=0, layer="below")
+    fig.add_hrect(y0=105, y1=115.5, fillcolor="rgba(255,255,255,0.018)", line_width=0, layer="below")
 
+    # target corridor
+    fig.add_vrect(x0=-2.8, x1=2.8, fillcolor="rgba(42,199,121,0.14)", line_width=0, layer="below")
+    fig.add_vrect(x0=-5.2, x1=5.2, fillcolor="rgba(42,199,121,0.05)", line_width=0, layer="below")
+
+    # subtle field grid
+    for x in [-8, -4, 4, 8]:
+        fig.add_vline(x=x, line_width=0.8, line_color="rgba(255,255,255,0.04)")
+    for y in [102, 106, 110, 114, 118]:
+        fig.add_hline(y=y, line_width=0.8, line_color="rgba(255,255,255,0.035)")
+
+    # target line
+    fig.add_vline(x=0, line_width=2.4, line_dash="dash", line_color="rgba(255,255,255,0.58)")
+
+    # soft dispersion zone
     fig.add_trace(
         go.Scatter(
             x=ellipse_x,
@@ -353,58 +365,109 @@ def build_premium_dispersion():
             mode="lines",
             line=dict(color="rgba(0,0,0,0)", width=0),
             fill="toself",
-            fillcolor="rgba(120,255,170,0.10)",
+            fillcolor="rgba(120,255,170,0.11)",
             hoverinfo="skip",
             showlegend=False,
         )
     )
 
+    # soft inner density glow
     fig.add_trace(
         go.Scatter(
-            x=shots_x,
-            y=shots_y,
-            mode="markers",
-            marker=dict(size=18, color="rgba(130,255,190,0.11)", line=dict(width=0)),
+            x=[-4.2, -2.0, 0.0, 2.4, 4.0, 3.0, 1.0, -1.4, -3.2, -4.2],
+            y=[112.8, 116.0, 116.8, 115.6, 112.6, 108.8, 106.8, 107.0, 109.0, 112.8],
+            mode="lines",
+            line=dict(color="rgba(0,0,0,0)", width=0),
+            fill="toself",
+            fillcolor="rgba(130,255,190,0.08)",
             hoverinfo="skip",
             showlegend=False,
         )
     )
 
+    # shot glow
     fig.add_trace(
         go.Scatter(
             x=shots_x,
             y=shots_y,
             mode="markers",
             marker=dict(
-                size=8.5,
-                color="rgba(242,255,246,0.99)",
-                line=dict(width=0.9, color="rgba(80,120,100,0.35)"),
+                size=20,
+                color="rgba(130,255,190,0.11)",
+                line=dict(width=0),
             ),
             hoverinfo="skip",
             showlegend=False,
         )
     )
 
+    # shot markers
     fig.add_trace(
         go.Scatter(
-            x=[trend_x],
-            y=[trend_y],
+            x=shots_x,
+            y=shots_y,
             mode="markers",
-            marker=dict(size=24, color="rgba(86,174,255,0.16)", line=dict(width=0)),
+            marker=dict(
+                size=8.8,
+                color="rgba(244,255,247,0.99)",
+                line=dict(width=0.8, color="rgba(70,110,90,0.28)"),
+            ),
             hoverinfo="skip",
             showlegend=False,
         )
     )
 
+    # rolling average glow
+    fig.add_trace(
+        go.Scatter(
+            x=[trend_x],
+            y=[trend_y],
+            mode="markers",
+            marker=dict(size=26, color="rgba(86,174,255,0.18)", line=dict(width=0)),
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+
+    # rolling average marker
     fig.add_trace(
         go.Scatter(
             x=[trend_x],
             y=[trend_y],
             mode="markers",
             marker=dict(
-                size=11,
+                size=11.5,
                 color="rgba(82,166,255,1)",
                 symbol="circle",
+                line=dict(width=1.2, color="rgba(255,255,255,0.82)"),
+            ),
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+
+    # latest average glow
+    fig.add_trace(
+        go.Scatter(
+            x=[latest_x],
+            y=[latest_y],
+            mode="markers",
+            marker=dict(size=30, color="rgba(255,79,79,0.16)", line=dict(width=0)),
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+
+    # latest average marker
+    fig.add_trace(
+        go.Scatter(
+            x=[latest_x],
+            y=[latest_y],
+            mode="markers",
+            marker=dict(
+                size=12.5,
+                color="rgba(255,88,88,1)",
+                symbol="diamond",
                 line=dict(width=1.2, color="rgba(255,255,255,0.78)"),
             ),
             hoverinfo="skip",
@@ -412,49 +475,42 @@ def build_premium_dispersion():
         )
     )
 
-    fig.add_trace(
-        go.Scatter(
-            x=[latest_x],
-            y=[latest_y],
-            mode="markers",
-            marker=dict(size=28, color="rgba(255,79,79,0.15)", line=dict(width=0)),
-            hoverinfo="skip",
-            showlegend=False,
-        )
+    fig.add_annotation(
+        x=0,
+        y=120.4,
+        text="Target Line",
+        showarrow=False,
+        font=dict(color="#cfe0e6", size=10),
     )
 
-    fig.add_trace(
-        go.Scatter(
-            x=[latest_x],
-            y=[latest_y],
-            mode="markers",
-            marker=dict(
-                size=12,
-                color="rgba(255,88,88,1)",
-                symbol="diamond",
-                line=dict(width=1.2, color="rgba(255,255,255,0.72)"),
-            ),
-            hoverinfo="skip",
-            showlegend=False,
-        )
+    fig.add_annotation(
+        x=trend_x - 0.4,
+        y=119.0,
+        text="Last 5 Avg",
+        showarrow=False,
+        font=dict(color="#9fd1ff", size=10),
     )
 
-    fig.add_annotation(x=0, y=120.7, text="Target Line", showarrow=False, font=dict(color="#cfe0e6", size=10))
-    fig.add_annotation(x=trend_x, y=121.2, text="Last 5 Avg", showarrow=False, font=dict(color="#9fd1ff", size=10))
-    fig.add_annotation(x=latest_x + 1.4, y=119.9, text="Latest Avg", showarrow=False, font=dict(color="#ffb1b1", size=10))
+    fig.add_annotation(
+        x=latest_x + 1.9,
+        y=118.0,
+        text="Latest Avg",
+        showarrow=False,
+        font=dict(color="#ffb1b1", size=10),
+    )
 
     fig.update_layout(
-        height=162,
+        height=170,
         margin=dict(l=4, r=4, t=8, b=4),
         paper_bgcolor="#13252d",
-        plot_bgcolor="#0c1b22",
+        plot_bgcolor="#0b1920",
         font=dict(color="#e8f0f2"),
     )
 
     fig.update_xaxes(
         title="Side Carry (m)",
         range=[-12, 12],
-        gridcolor="rgba(255,255,255,0.05)",
+        gridcolor="rgba(255,255,255,0.00)",
         zeroline=False,
         tickfont=dict(size=9),
         title_font=dict(size=10),
@@ -464,7 +520,7 @@ def build_premium_dispersion():
     fig.update_yaxes(
         title="Carry Distance (m)",
         range=[98, 122],
-        gridcolor="rgba(255,255,255,0.05)",
+        gridcolor="rgba(255,255,255,0.00)",
         zeroline=False,
         tickfont=dict(size=9),
         title_font=dict(size=10),
