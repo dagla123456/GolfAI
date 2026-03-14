@@ -3,13 +3,52 @@ import plotly.graph_objects as go
 import streamlit.components.v1 as components
 from golfai.v4_styles import get_v4_css
 from golfai.v4_cards import card_open, card_close
+from golfai.scoring import build_session_score
 
 
-def build_mock_gauge():
+def get_performance_context(detector_results=None):
+    if detector_results:
+        score_data = build_session_score(detector_results)
+        performance_score = score_data.get("performance_score", 78)
+        primary_issue = score_data.get("primary_issue", "Strike Quality")
+        secondary_issue = score_data.get("secondary_issue", "Start Line Control")
+    else:
+        performance_score = 78
+        primary_issue = "Strike Quality"
+        secondary_issue = "Sequencing"
+
+    if performance_score >= 80:
+        performance_label = "Excellent"
+        trend_text = "▲ Strong session"
+        trend_color = "#1ed760"
+    elif performance_score >= 65:
+        performance_label = "Good"
+        trend_text = "▲ Improving"
+        trend_color = "#1ed760"
+    elif performance_score >= 50:
+        performance_label = "Developing"
+        trend_text = "● Mixed session"
+        trend_color = "#ffd166"
+    else:
+        performance_label = "Needs Work"
+        trend_text = "▼ Below standard"
+        trend_color = "#ff6b6b"
+
+    return {
+        "performance_score": performance_score,
+        "performance_label": performance_label,
+        "trend_text": trend_text,
+        "trend_color": trend_color,
+        "primary_issue": primary_issue,
+        "secondary_issue": secondary_issue,
+    }
+
+
+def build_mock_gauge(score_value):
     fig = go.Figure(
         go.Indicator(
             mode="gauge+number",
-            value=78,
+            value=score_value,
             number={"font": {"size": 30, "color": "#f5f7fa"}},
             gauge={
                 "axis": {"range": [0, 100], "tickcolor": "#cfd8dc"},
@@ -25,7 +64,7 @@ def build_mock_gauge():
                 "threshold": {
                     "line": {"color": "#f5f7fa", "width": 3},
                     "thickness": 0.8,
-                    "value": 78,
+                    "value": score_value,
                 },
             },
         )
@@ -283,7 +322,9 @@ def render_practice_focus():
     )
 
 
-def render_v4_dashboard_prototype():
+def render_v4_dashboard_prototype(detector_results=None):
+    performance = get_performance_context(detector_results)
+
     st.markdown(get_v4_css(), unsafe_allow_html=True)
     st.markdown('<div class="v4-shell">', unsafe_allow_html=True)
 
@@ -328,19 +369,32 @@ def render_v4_dashboard_prototype():
     top_left, top_right = st.columns(2)
     with top_left:
         card_open("Performance Score")
-        st.plotly_chart(build_mock_gauge(), use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(
+            build_mock_gauge(performance["performance_score"]),
+            use_container_width=True,
+            config={"displayModeBar": False},
+        )
         st.markdown(
-            """
+            f"""
             <div style="
                 text-align:center;
                 margin-top:4px;
                 font-size:12px;
                 font-weight:700;
-                color:#1ed760;
+                color:{performance["trend_color"]};
                 letter-spacing:0.02em;
                 line-height:1.1;
             ">
-                ▲ Improving
+                {performance["trend_text"]} · {performance["performance_label"]}
+            </div>
+            <div style="
+                text-align:center;
+                margin-top:4px;
+                font-size:10px;
+                color:#c7d4da;
+                line-height:1.2;
+            ">
+                Priority: {performance["primary_issue"]} | Next: {performance["secondary_issue"]}
             </div>
             """,
             unsafe_allow_html=True,
