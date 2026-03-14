@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import plotly.graph_objects as go
 from golfai.scoring import build_session_score
 
@@ -191,131 +192,138 @@ def render_premium_distance_card():
 
     html = f"""
     <div style="
-        display:flex;
-        justify-content:space-between;
-        align-items:flex-start;
-        margin-bottom:10px;
-    ">
-        <div>
-            <div style="
-                font-size:32px;
-                font-weight:800;
-                color:#f5f7fa;
-                line-height:0.95;
-                margin-bottom:2px;
-            ">
-                {avg:.1f}m
-            </div>
-            <div style="
-                font-size:11px;
-                color:#d7e5ea;
-                font-weight:700;
-                letter-spacing:0.06em;
-                text-transform:uppercase;
-            ">
-                Average Carry
-            </div>
-        </div>
-
-        <div style="text-align:right;">
-            <div style="
-                font-size:11px;
-                color:#9fd9b4;
-                font-weight:700;
-                letter-spacing:0.05em;
-                text-transform:uppercase;
-                margin-bottom:2px;
-            ">
-                Trust Window
-            </div>
-            <div style="
-                font-size:18px;
-                color:#f3fbf6;
-                font-weight:800;
-                line-height:1;
-            ">
-                {reliable_min:.0f}–{reliable_max:.0f}m
-            </div>
-        </div>
-    </div>
-
-    <div style="
-        position:relative;
-        height:20px;
-        border-radius:999px;
-        background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-        border:1px solid rgba(255,255,255,0.06);
-        overflow:visible;
-        margin-top:6px;
-        margin-bottom:12px;
+        color:#eef3f7;
+        font-family:Arial, sans-serif;
+        padding-top:2px;
     ">
         <div style="
-            position:absolute;
-            left:{reliable_left:.2f}%;
-            width:{reliable_width:.2f}%;
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            margin-bottom:10px;
+        ">
+            <div>
+                <div style="
+                    font-size:32px;
+                    font-weight:800;
+                    color:#f5f7fa;
+                    line-height:0.95;
+                    margin-bottom:2px;
+                ">
+                    {avg:.1f}m
+                </div>
+                <div style="
+                    font-size:11px;
+                    color:#d7e5ea;
+                    font-weight:700;
+                    letter-spacing:0.06em;
+                    text-transform:uppercase;
+                ">
+                    Average Carry
+                </div>
+            </div>
+
+            <div style="text-align:right;">
+                <div style="
+                    font-size:11px;
+                    color:#9fd9b4;
+                    font-weight:700;
+                    letter-spacing:0.05em;
+                    text-transform:uppercase;
+                    margin-bottom:2px;
+                ">
+                    Trust Window
+                </div>
+                <div style="
+                    font-size:18px;
+                    color:#f3fbf6;
+                    font-weight:800;
+                    line-height:1;
+                ">
+                    {reliable_min:.0f}–{reliable_max:.0f}m
+                </div>
+            </div>
+        </div>
+
+        <div style="
+            position:relative;
             height:20px;
-            top:0;
             border-radius:999px;
-            background:linear-gradient(90deg, #169c4f, #1ed760);
-            box-shadow:0 0 12px rgba(30,215,96,0.22);
-        "></div>
-
-        <div style="
-            position:absolute;
-            left:{avg_pos:.2f}%;
-            top:50%;
-            width:16px;
-            height:16px;
-            border-radius:50%;
-            background:#ff5a5a;
-            border:2px solid rgba(255,255,255,0.80);
-            transform:translate(-50%, -50%);
-            box-shadow:0 0 10px rgba(255,90,90,0.40);
-        "></div>
-    </div>
-
-    <div style="
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        margin-top:4px;
-    ">
-        <div style="
-            font-size:11px;
-            color:#c7d4da;
-            font-weight:700;
+            background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+            border:1px solid rgba(255,255,255,0.06);
+            overflow:visible;
+            margin-top:6px;
+            margin-bottom:12px;
         ">
-            {full_min:.0f}m
+            <div style="
+                position:absolute;
+                left:{reliable_left:.2f}%;
+                width:{reliable_width:.2f}%;
+                height:20px;
+                top:0;
+                border-radius:999px;
+                background:linear-gradient(90deg, #169c4f, #1ed760);
+                box-shadow:0 0 12px rgba(30,215,96,0.22);
+            "></div>
+
+            <div style="
+                position:absolute;
+                left:{avg_pos:.2f}%;
+                top:50%;
+                width:16px;
+                height:16px;
+                border-radius:50%;
+                background:#ff5a5a;
+                border:2px solid rgba(255,255,255,0.80);
+                transform:translate(-50%, -50%);
+                box-shadow:0 0 10px rgba(255,90,90,0.40);
+            "></div>
         </div>
+
         <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-top:4px;
+        ">
+            <div style="
+                font-size:11px;
+                color:#c7d4da;
+                font-weight:700;
+            ">
+                {full_min:.0f}m
+            </div>
+            <div style="
+                font-size:10px;
+                color:#9fb8c2;
+                font-weight:700;
+                letter-spacing:0.08em;
+                text-transform:uppercase;
+            ">
+                Full Range
+            </div>
+            <div style="
+                font-size:11px;
+                color:#c7d4da;
+                font-weight:700;
+            ">
+                {full_max:.0f}m
+            </div>
+        </div>
+
+        <div style="
+            text-align:center;
+            margin-top:8px;
             font-size:10px;
-            color:#9fb8c2;
-            font-weight:700;
-            letter-spacing:0.08em;
-            text-transform:uppercase;
-        ">
-            Full Range
-        </div>
-        <div style="
-            font-size:11px;
             color:#c7d4da;
-            font-weight:700;
+            line-height:1.2;
         ">
-            {full_max:.0f}m
+            Reliable carry is clustering inside the green corridor
         </div>
-    </div>
-
-    <div style="
-        text-align:center;
-        margin-top:8px;
-        font-size:10px;
-        color:#c7d4da;
-        line-height:1.2;
-    ">
-        Reliable carry is clustering inside the green corridor
     </div>
     """
-    st.markdown(html, unsafe_allow_html=True)
+
+    components.html(html, height=150)
 
 
 def build_premium_dispersion():
@@ -333,36 +341,10 @@ def build_premium_dispersion():
 
     fig = go.Figure()
 
-    fig.add_hrect(
-        y0=98,
-        y1=122,
-        fillcolor="rgba(255,255,255,0.012)",
-        line_width=0,
-        layer="below",
-    )
-
-    fig.add_vrect(
-        x0=-3.2,
-        x1=3.2,
-        fillcolor="rgba(42,199,121,0.12)",
-        line_width=0,
-        layer="below",
-    )
-
-    fig.add_vrect(
-        x0=-5.5,
-        x1=5.5,
-        fillcolor="rgba(42,199,121,0.05)",
-        line_width=0,
-        layer="below",
-    )
-
-    fig.add_vline(
-        x=0,
-        line_width=2.2,
-        line_dash="dash",
-        line_color="rgba(255,255,255,0.54)",
-    )
+    fig.add_hrect(y0=98, y1=122, fillcolor="rgba(255,255,255,0.012)", line_width=0, layer="below")
+    fig.add_vrect(x0=-3.2, x1=3.2, fillcolor="rgba(42,199,121,0.12)", line_width=0, layer="below")
+    fig.add_vrect(x0=-5.5, x1=5.5, fillcolor="rgba(42,199,121,0.05)", line_width=0, layer="below")
+    fig.add_vline(x=0, line_width=2.2, line_dash="dash", line_color="rgba(255,255,255,0.54)")
 
     fig.add_trace(
         go.Scatter(
@@ -382,11 +364,7 @@ def build_premium_dispersion():
             x=shots_x,
             y=shots_y,
             mode="markers",
-            marker=dict(
-                size=18,
-                color="rgba(130,255,190,0.11)",
-                line=dict(width=0),
-            ),
+            marker=dict(size=18, color="rgba(130,255,190,0.11)", line=dict(width=0)),
             hoverinfo="skip",
             showlegend=False,
         )
@@ -412,11 +390,7 @@ def build_premium_dispersion():
             x=[trend_x],
             y=[trend_y],
             mode="markers",
-            marker=dict(
-                size=24,
-                color="rgba(86,174,255,0.16)",
-                line=dict(width=0),
-            ),
+            marker=dict(size=24, color="rgba(86,174,255,0.16)", line=dict(width=0)),
             hoverinfo="skip",
             showlegend=False,
         )
@@ -443,11 +417,7 @@ def build_premium_dispersion():
             x=[latest_x],
             y=[latest_y],
             mode="markers",
-            marker=dict(
-                size=28,
-                color="rgba(255,79,79,0.15)",
-                line=dict(width=0),
-            ),
+            marker=dict(size=28, color="rgba(255,79,79,0.15)", line=dict(width=0)),
             hoverinfo="skip",
             showlegend=False,
         )
@@ -469,29 +439,9 @@ def build_premium_dispersion():
         )
     )
 
-    fig.add_annotation(
-        x=0,
-        y=120.7,
-        text="Target Line",
-        showarrow=False,
-        font=dict(color="#cfe0e6", size=10),
-    )
-
-    fig.add_annotation(
-        x=trend_x,
-        y=121.2,
-        text="Last 5 Avg",
-        showarrow=False,
-        font=dict(color="#9fd1ff", size=10),
-    )
-
-    fig.add_annotation(
-        x=latest_x + 1.4,
-        y=119.9,
-        text="Latest Avg",
-        showarrow=False,
-        font=dict(color="#ffb1b1", size=10),
-    )
+    fig.add_annotation(x=0, y=120.7, text="Target Line", showarrow=False, font=dict(color="#cfe0e6", size=10))
+    fig.add_annotation(x=trend_x, y=121.2, text="Last 5 Avg", showarrow=False, font=dict(color="#9fd1ff", size=10))
+    fig.add_annotation(x=latest_x + 1.4, y=119.9, text="Latest Avg", showarrow=False, font=dict(color="#ffb1b1", size=10))
 
     fig.update_layout(
         height=162,
