@@ -1,6 +1,4 @@
 import streamlit as st
-from golfai.v4_styles import BASE_LAYOUT_FIX
-st.markdown(BASE_LAYOUT_FIX, unsafe_allow_html=True)
 import plotly.graph_objects as go
 import streamlit.components.v1 as components
 from golfai.v4_styles import get_v4_css
