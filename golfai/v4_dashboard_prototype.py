@@ -1,8 +1,8 @@
 import streamlit as st
 import plotly.graph_objects as go
-import streamlit.components.v1 as components
 from golfai.v4_styles import get_v4_css
 from golfai.v4_cards import card_open, card_close
+from golfai.v4_header import render_v4_header
 from golfai.scoring import build_session_score
 
 
@@ -49,7 +49,7 @@ def build_mock_gauge(score_value):
         go.Indicator(
             mode="gauge+number",
             value=score_value,
-            number={"font": {"size": 30, "color": "#f5f7fa"}},
+            number={"font": {"size": 24, "color": "#f5f7fa"}},
             gauge={
                 "axis": {"range": [0, 100], "tickcolor": "#cfd8dc"},
                 "bar": {"color": "rgba(0,0,0,0)"},
@@ -70,8 +70,8 @@ def build_mock_gauge(score_value):
         )
     )
     fig.update_layout(
-        height=165,
-        margin=dict(l=8, r=8, t=20, b=8),
+        height=125,
+        margin=dict(l=8, r=8, t=8, b=8),
         paper_bgcolor="#142c34",
         font={"color": "#e8f0f2"},
     )
@@ -328,68 +328,78 @@ def render_v4_dashboard_prototype(detector_results=None):
     st.markdown(get_v4_css(), unsafe_allow_html=True)
     st.markdown('<div class="v4-shell">', unsafe_allow_html=True)
 
-    header_html = """
-    <div style="
-        background: linear-gradient(135deg,#183a2d,#1f4a35);
-        padding:8px 12px;
-        border-radius:14px;
-        margin-bottom:6px;
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        box-shadow:0 8px 18px rgba(0,0,0,0.24);
-        color:white;
-        font-family:Arial, sans-serif;
-    ">
-        <div>
-            <div style="font-size:16px;font-weight:800;color:white;margin-bottom:3px;letter-spacing:0.02em;">
-                GolfAI Command Centre
-            </div>
-            <div style="color:#d8eee4;font-size:11px;margin-bottom:1px;">
-                Session: mlm2pro_shotexport_011826.csv
-            </div>
-            <div style="color:#d8eee4;font-size:11px;">
-                Shots Analysed: 53
-            </div>
-        </div>
-        <div style="
-            font-size:11px;
-            color:#e7fff2;
-            background:rgba(255,255,255,0.10);
-            padding:6px 9px;
-            border-radius:9px;
-            font-weight:600;
-        ">
-            AI Practice Intelligence
-        </div>
-    </div>
-    """
-    components.html(header_html, height=68)
+    render_v4_header(
+        {
+            "session_file": "mlm2pro_shotexport_011826.csv",
+            "shots_analysed": 53,
+            "club_label": "7 Iron",
+            "mode_label": "Command Centre",
+        }
+    )
 
     top_left, top_right = st.columns(2)
     with top_left:
         card_open("Performance Score")
+
+        score = performance["performance_score"]
+        label = performance["performance_label"]
+        trend_text = performance["trend_text"]
+        trend_color = performance["trend_color"]
+
+        st.markdown(
+            f"""
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:flex-start;
+                margin-bottom:6px;
+            ">
+                <div>
+                    <div style="
+                        font-size:34px;
+                        font-weight:800;
+                        color:#f5f7fa;
+                        line-height:0.95;
+                        margin-bottom:2px;
+                    ">
+                        {score}
+                    </div>
+                    <div style="
+                        font-size:12px;
+                        color:#d7e5ea;
+                        font-weight:700;
+                        letter-spacing:0.03em;
+                        text-transform:uppercase;
+                    ">
+                        {label}
+                    </div>
+                </div>
+                <div style="
+                    text-align:right;
+                    font-size:11px;
+                    color:{trend_color};
+                    font-weight:700;
+                    line-height:1.2;
+                    margin-top:2px;
+                ">
+                    {trend_text}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
         st.plotly_chart(
-            build_mock_gauge(performance["performance_score"]),
+            build_mock_gauge(score),
             use_container_width=True,
             config={"displayModeBar": False},
         )
+
         st.markdown(
             f"""
             <div style="
                 text-align:center;
-                margin-top:4px;
-                font-size:12px;
-                font-weight:700;
-                color:{performance["trend_color"]};
-                letter-spacing:0.02em;
-                line-height:1.1;
-            ">
-                {performance["trend_text"]} · {performance["performance_label"]}
-            </div>
-            <div style="
-                text-align:center;
-                margin-top:4px;
+                margin-top:3px;
                 font-size:10px;
                 color:#c7d4da;
                 line-height:1.2;
@@ -399,7 +409,9 @@ def render_v4_dashboard_prototype(detector_results=None):
             """,
             unsafe_allow_html=True,
         )
+
         card_close()
+
     with top_right:
         card_open("Carry Distance Profile")
         st.plotly_chart(build_mock_distance(), use_container_width=True, config={"displayModeBar": False})
