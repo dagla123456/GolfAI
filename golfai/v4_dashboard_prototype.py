@@ -400,7 +400,6 @@ def render_v4_dashboard_prototype(detector_results=None):
             unsafe_allow_html=True,
         )
         card_close()
-
     with top_right:
         card_open("Carry Distance Profile")
         st.plotly_chart(build_mock_distance(), use_container_width=True, config={"displayModeBar": False})
