@@ -79,47 +79,88 @@ def build_mock_gauge(score_value):
 
 
 def build_mock_distance():
+    avg = 102.5
+    reliable_min = 95
+    reliable_max = 113
+    full_min = 72
+    full_max = 132
+
     fig = go.Figure()
+
     fig.add_shape(
         type="rect",
-        x0=72,
-        x1=132,
+        x0=full_min,
+        x1=full_max,
         y0=0.40,
         y1=0.60,
-        line=dict(width=0),
-        fillcolor="rgba(160,170,180,0.18)",
+        line=dict(width=1, color="rgba(255,255,255,0.08)"),
+        fillcolor="rgba(255,255,255,0.05)",
     )
+
     fig.add_shape(
         type="rect",
-        x0=95,
-        x1=113,
-        y0=0.32,
-        y1=0.68,
+        x0=reliable_min,
+        x1=reliable_max,
+        y0=0.34,
+        y1=0.66,
         line=dict(width=0),
         fillcolor="rgba(30,215,96,0.88)",
     )
+
     fig.add_trace(
         go.Scatter(
-            x=[102.5],
-            y=[0.5],
-            mode="markers+text",
-            marker=dict(size=10, color="rgba(255,90,90,1)"),
-            text=["Avg 102.5m"],
-            textposition="top center",
-            textfont=dict(color="white", size=10),
+            x=[avg],
+            y=[0.50],
+            mode="markers",
+            marker=dict(
+                size=14,
+                color="rgba(255,90,90,1)",
+                line=dict(width=2, color="rgba(255,255,255,0.80)")
+            ),
             showlegend=False,
+            hoverinfo="skip",
         )
     )
-    fig.add_annotation(x=72, y=0.10, text="72m", showarrow=False, font=dict(color="white", size=9))
-    fig.add_annotation(x=132, y=0.10, text="132m", showarrow=False, font=dict(color="white", size=9))
-    fig.add_annotation(x=104, y=0.84, text="Reliable 95–113m", showarrow=False, font=dict(color="#dff7ea", size=10))
+
+    fig.add_annotation(
+        x=avg,
+        y=0.84,
+        text="AVG",
+        showarrow=False,
+        font=dict(color="#ffb3b3", size=10),
+    )
+    fig.add_annotation(
+        x=avg,
+        y=0.76,
+        text=f"{avg:.1f}m",
+        showarrow=False,
+        font=dict(color="#ffffff", size=15),
+    )
+    fig.add_annotation(
+        x=(reliable_min + reliable_max) / 2,
+        y=0.18,
+        text=f"Reliable Window  {reliable_min}–{reliable_max}m",
+        showarrow=False,
+        font=dict(color="#dff7ea", size=11),
+    )
+
     fig.update_layout(
-        height=120,
-        margin=dict(l=4, r=4, t=4, b=4),
+        height=118,
+        margin=dict(l=6, r=6, t=6, b=6),
         paper_bgcolor="#142c34",
         plot_bgcolor="#142c34",
-        xaxis=dict(range=[65, 138], visible=False),
-        yaxis=dict(range=[0, 1], visible=False),
+        font=dict(color="#e8f0f2"),
+        xaxis=dict(
+            range=[68, 136],
+            showgrid=False,
+            zeroline=False,
+            tickmode="array",
+            tickvals=[full_min, reliable_min, avg, reliable_max, full_max],
+            ticktext=[f"{full_min}m", f"{reliable_min}", f"{avg:.0f}", f"{reliable_max}", f"{full_max}m"],
+            tickfont=dict(size=10, color="#cfd8dc"),
+            fixedrange=True,
+        ),
+        yaxis=dict(range=[0, 1], visible=False, fixedrange=True),
     )
     return fig
 
@@ -374,11 +415,69 @@ def render_v4_dashboard_prototype(detector_results=None):
 
     with top_right:
         card_open("Carry Distance Profile")
-        st.plotly_chart(build_mock_distance(), use_container_width=True, config={"displayModeBar": False})
+
         st.markdown(
-            '<div style="font-size:11px; color:#d7e5ea; margin-top:2px;">Reliable carry window: 95–113 m</div>',
+            """
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:flex-start;
+                margin-bottom:4px;
+            ">
+                <div>
+                    <div style="
+                        font-size:30px;
+                        font-weight:800;
+                        color:#f5f7fa;
+                        line-height:0.95;
+                        margin-bottom:2px;
+                    ">
+                        102.5m
+                    </div>
+                    <div style="
+                        font-size:11px;
+                        color:#d7e5ea;
+                        font-weight:700;
+                        letter-spacing:0.05em;
+                        text-transform:uppercase;
+                    ">
+                        Average Carry
+                    </div>
+                </div>
+                <div style="
+                    text-align:right;
+                    font-size:11px;
+                    line-height:1.2;
+                ">
+                    <div style="color:#9fd9b4; font-weight:700;">Reliable Window</div>
+                    <div style="color:#f3fbf6; font-weight:800;">95–113m</div>
+                </div>
+            </div>
+            """,
             unsafe_allow_html=True,
         )
+
+        st.plotly_chart(
+            build_mock_distance(),
+            use_container_width=True,
+            config={"displayModeBar": False},
+        )
+
+        st.markdown(
+            """
+            <div style="
+                text-align:center;
+                margin-top:2px;
+                font-size:10px;
+                color:#c7d4da;
+                line-height:1.2;
+            ">
+                Full range: 72m to 132m
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
         card_close()
 
     middle_left, middle_right = st.columns([1.05, 0.95])
