@@ -4,10 +4,6 @@ import plotly.graph_objects as go
 from golfai.scoring import build_session_score
 
 
-# ---------------------------------------------------
-# GLOBAL CSS
-# ---------------------------------------------------
-
 def get_premium_css():
     return """
     <style>
@@ -82,10 +78,6 @@ def get_premium_css():
     """
 
 
-# ---------------------------------------------------
-# HELPERS
-# ---------------------------------------------------
-
 def premium_card_open(title):
     st.markdown(
         f"""
@@ -152,10 +144,6 @@ def get_performance_context(detector_results=None):
     }
 
 
-# ---------------------------------------------------
-# MINI HEADER GAUGE
-# ---------------------------------------------------
-
 def build_mini_gauge(score):
     fig = go.Figure(
         go.Indicator(
@@ -189,10 +177,6 @@ def build_mini_gauge(score):
 
     return fig
 
-
-# ---------------------------------------------------
-# DISTANCE CARD
-# ---------------------------------------------------
 
 def render_premium_distance_card():
     avg = 102.5
@@ -340,10 +324,6 @@ def render_premium_distance_card():
     """
     components.html(html, height=132)
 
-
-# ---------------------------------------------------
-# SESSION SUMMARY CARD
-# ---------------------------------------------------
 
 def render_premium_summary_card():
     html = """
@@ -499,10 +479,6 @@ def render_premium_summary_card():
     components.html(html, height=220)
 
 
-# ---------------------------------------------------
-# PRACTICE FOCUS CARD
-# ---------------------------------------------------
-
 def render_premium_focus_card():
     html = """
     <div style="
@@ -590,10 +566,6 @@ def render_premium_focus_card():
     components.html(html, height=220)
 
 
-# ---------------------------------------------------
-# PROGRESS CHART
-# ---------------------------------------------------
-
 def build_progress_chart():
     sessions = ["S1", "S2", "S3", "S4", "S5"]
     strike_quality = [48, 54, 57, 61, 65]
@@ -636,16 +608,17 @@ def build_progress_chart():
     )
 
     fig.update_layout(
-        height=150,
-        margin=dict(l=4, r=4, t=8, b=4),
+        height=165,
+        margin=dict(l=4, r=4, t=10, b=4),
         paper_bgcolor="#13252d",
         plot_bgcolor="#0b1920",
         font=dict(color="#e8f0f2"),
         legend=dict(
             orientation="h",
-            y=1.08,
+            y=1.12,
             x=0,
             font=dict(size=9),
+            bgcolor="rgba(0,0,0,0)"
         ),
     )
 
@@ -662,10 +635,6 @@ def build_progress_chart():
 
     return fig
 
-
-# ---------------------------------------------------
-# DISPERSION CHART
-# ---------------------------------------------------
 
 def build_premium_dispersion():
     shots_x = [-2.8, -1.5, -0.3, 0.8, 2.1, -1.2, 0.5, 1.6, -0.8, 2.8, -2.2, 0.2, 1.2, -1.9, 2.4]
@@ -805,7 +774,7 @@ def build_premium_dispersion():
     fig.add_annotation(x=latest_x + 1.9, y=118.0, text="Latest Avg", showarrow=False, font=dict(color="#ffb1b1", size=10))
 
     fig.update_layout(
-        height=156,
+        height=190,
         margin=dict(l=4, r=4, t=8, b=4),
         paper_bgcolor="#13252d",
         plot_bgcolor="#0b1920",
@@ -835,17 +804,12 @@ def build_premium_dispersion():
     return fig
 
 
-# ---------------------------------------------------
-# MAIN DASHBOARD
-# ---------------------------------------------------
-
 def render_v4_dashboard_premium(detector_results=None):
     performance = get_performance_context(detector_results)
 
     st.markdown(get_premium_css(), unsafe_allow_html=True)
     st.markdown('<div class="premium-shell">', unsafe_allow_html=True)
 
-    # HEADER
     header_left, header_right = st.columns([5, 1])
 
     with header_left:
@@ -924,8 +888,7 @@ def render_v4_dashboard_premium(detector_results=None):
                 unsafe_allow_html=True,
             )
 
-    # ROW 1
-    top_left, top_right = st.columns([1.18, 1.18])
+    top_left, top_right = st.columns([1.00, 1.22])
 
     with top_left:
         premium_card_open("Carry Distance Profile")
@@ -1020,15 +983,20 @@ def render_v4_dashboard_premium(detector_results=None):
 
         premium_card_close()
 
-    # ROW 2
-    mid_left, mid_right = st.columns([1.00, 1.00])
-
-    with mid_left:
+    middle_left, _ = st.columns([1.00, 1.22])
+    with middle_left:
         premium_card_open("Session Summary")
         render_premium_summary_card()
         premium_card_close()
 
-    with mid_right:
+    bottom_left, bottom_right = st.columns([1.00, 1.22])
+
+    with bottom_left:
+        premium_card_open("Practice Focus")
+        render_premium_focus_card()
+        premium_card_close()
+
+    with bottom_right:
         premium_card_open("Progress Over Time")
         st.plotly_chart(
             build_progress_chart(),
@@ -1049,14 +1017,6 @@ def render_v4_dashboard_premium(detector_results=None):
             """,
             unsafe_allow_html=True,
         )
-        premium_card_close()
-
-    # ROW 3
-    bottom_left, _ = st.columns([1.00, 1.00])
-
-    with bottom_left:
-        premium_card_open("Practice Focus")
-        render_premium_focus_card()
         premium_card_close()
 
     st.markdown("</div>", unsafe_allow_html=True)
