@@ -414,3 +414,59 @@ def build_shot_pattern_data(df):
         "ellipse_width": ellipse_width,
         "ellipse_height": ellipse_height
     }
+
+def build_detector_results(df):
+    """
+    Run all detector functions and return a single detector_results dictionary.
+    """
+
+    strike_quality, strike_info = compute_strike_quality(df)
+    start_line_control, start_line_info = compute_start_line_control(df)
+    lowpoint_score, lowpoint_info = compute_lowpoint_score(df)
+    sequencing_score, sequencing_info = compute_sequencing_score(df)
+
+    momentum_info = compute_session_momentum(df)
+    drift_info = compute_swing_drift(df)
+    dispersion_info = compute_dispersion_intelligence(df)
+    shot_pattern_data = build_shot_pattern_data(df)
+
+    # Optional blueprint logic
+    blueprint_signature = build_blueprint_signature(df)
+    blueprint_info = count_blueprint_matches(df, blueprint_signature)
+
+    # Optional carry consistency score
+    carry_std_score = lowpoint_info.get("lp_score_carry", 0)
+
+    detector_results = {
+        # core scores
+        "strike_quality": strike_quality,
+        "start_line_control": start_line_control,
+        "lowpoint_score": lowpoint_score,
+        "sequencing_score": sequencing_score,
+
+        # secondary scores
+        "carry_std_score": carry_std_score,
+        "blueprint_match_pct": blueprint_info.get("blueprint_match_pct", 0.0),
+        "corridor_pct": dispersion_info.get("corridor_pct", 0.0),
+
+        # momentum / drift
+        "momentum_last20": momentum_info.get("momentum_last20", 0),
+        "momentum_delta": momentum_info.get("momentum_delta", 0.0),
+        "momentum_label": momentum_info.get("momentum_label", "Unavailable"),
+        "drift_detected": drift_info.get("drift_detected", False),
+        "drift_label": drift_info.get("drift_label", "Unavailable"),
+
+        # detail blocks for UI / future use
+        "strike_info": strike_info,
+        "start_line_info": start_line_info,
+        "lowpoint_info": lowpoint_info,
+        "sequencing_info": sequencing_info,
+        "momentum_info": momentum_info,
+        "drift_info": drift_info,
+        "dispersion_info": dispersion_info,
+        "shot_pattern_data": shot_pattern_data,
+        "blueprint_signature": blueprint_signature,
+        "blueprint_info": blueprint_info,
+    }
+
+    return detector_results
