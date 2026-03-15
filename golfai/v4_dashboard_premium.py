@@ -493,7 +493,7 @@ def render_v4_dashboard_premium(detector_results=None):
         premium_card_close()
 
         premium_card_open("Session Summary")
-        render_premium_summary_card()
+        render_premium_summary_card(pipeline_output["session_summary"])
         premium_card_close()
 
         premium_card_open("Practice Focus")
