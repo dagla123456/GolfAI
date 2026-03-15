@@ -314,8 +314,8 @@ def build_progress_chart():
     ))
 
     fig.update_layout(
-        height=200,
-        margin=dict(l=4, r=4, t=8, b=4),
+        height=230,
+        margin=dict(l=4, r=4, t=40, b=4),
         paper_bgcolor="#13252d",
         plot_bgcolor="#0b1920",
         font=dict(color="#e8f0f2"),
