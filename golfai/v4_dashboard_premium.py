@@ -440,7 +440,13 @@ def render_v4_dashboard_premium(detector_results=None, pipeline_output=None):
         session_summary = pipeline_output["session_summary"]
         performance_score = session_summary.get("performance_score", 0)
     else:
-        session_summary = {}
+        session_summary = {
+            "strike_quality": 65,
+            "blueprint_match_pct": 52.0,
+            "corridor_pct": 38.0,
+            "performance_score": 78,
+            "primary_issue": "No session loaded"
+        }
         performance_score = get_performance_context(detector_results)
 
     st.markdown(get_premium_css(), unsafe_allow_html=True)
@@ -498,7 +504,7 @@ def render_v4_dashboard_premium(detector_results=None, pipeline_output=None):
         premium_card_close()
 
         premium_card_open("Session Summary")
-        render_premium_summary_card(pipeline_output["session_summary"])
+        render_premium_summary_card(session_summary)
         premium_card_close()
 
         premium_card_open("Practice Focus")
