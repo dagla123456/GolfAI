@@ -438,6 +438,7 @@ def build_detector_results(df):
     carry_std_score = lowpoint_info.get("lp_score_carry", 0)
 
     detector_results = {
+        "source_session_file": df["session_file"].iloc[0] if "session_file" in df.columns and len(df) > 0 else "unknown_session",
         # core scores
         "strike_quality": strike_quality,
         "start_line_control": start_line_control,
