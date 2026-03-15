@@ -2,6 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 import plotly.graph_objects as go
 from golfai.scoring import build_session_score
+from golfai.session_history import load_history
 
 
 def get_premium_css():
@@ -271,24 +272,45 @@ def render_premium_focus_card():
 
 
 def build_progress_chart():
-    sessions = ["S1", "S2", "S3", "S4", "S5"]
-    strike_quality = [48, 54, 57, 61, 65]
-    blueprint_match = [36, 40, 44, 48, 52]
-    dispersion_control = [32, 35, 37, 33, 29]
+
+    history = load_history()
+
+    if len(history) < 2:
+        return go.Figure()
+
+    sessions = list(range(1, len(history) + 1))
+
+    strike_quality = [h.get("strike_quality", 0) for h in history]
+    blueprint_match = [h.get("blueprint_match_pct", 0) for h in history]
+    dispersion_control = [h.get("corridor_pct", 0) for h in history]
 
     fig = go.Figure()
 
     fig.add_trace(go.Scatter(
-        x=sessions, y=strike_quality, mode="lines+markers", name="Strike Quality",
-        line=dict(color="#1ed760", width=3), marker=dict(size=7)
+        x=sessions,
+        y=strike_quality,
+        mode="lines+markers",
+        name="Strike Quality",
+        line=dict(color="#1ed760", width=3),
+        marker=dict(size=7)
     ))
+
     fig.add_trace(go.Scatter(
-        x=sessions, y=blueprint_match, mode="lines+markers", name="Blueprint Match",
-        line=dict(color="#56a6ff", width=3), marker=dict(size=7)
+        x=sessions,
+        y=blueprint_match,
+        mode="lines+markers",
+        name="Blueprint Match",
+        line=dict(color="#56a6ff", width=3),
+        marker=dict(size=7)
     ))
+
     fig.add_trace(go.Scatter(
-        x=sessions, y=dispersion_control, mode="lines+markers", name="Dispersion Control",
-        line=dict(color="#ff8c42", width=3), marker=dict(size=7)
+        x=sessions,
+        y=dispersion_control,
+        mode="lines+markers",
+        name="Dispersion Corridor",
+        line=dict(color="#ff8c42", width=3),
+        marker=dict(size=7)
     ))
 
     fig.update_layout(
@@ -309,12 +331,12 @@ def build_progress_chart():
     )
 
     fig.update_xaxes(
+        title="Session",
         gridcolor="rgba(255,255,255,0.04)",
         tickfont=dict(size=9),
     )
 
     fig.update_yaxes(
-        range=[25, 70],
         gridcolor="rgba(255,255,255,0.05)",
         tickfont=dict(size=9),
     )
