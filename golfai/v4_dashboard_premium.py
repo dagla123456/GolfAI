@@ -321,7 +321,7 @@ def build_progress_chart():
         font=dict(color="#e8f0f2"),
         legend=dict(
             orientation="h",
-            y=0.02,
+            y=1.14,
             yanchor="bottom",
             x=0.0,
             xanchor="left",
