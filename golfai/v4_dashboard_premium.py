@@ -357,13 +357,12 @@ def build_premium_dispersion(detector_results=None):
     if shots_x and shots_y:
         trend_x = sum(shots_x) / len(shots_x)
         trend_y = sum(shots_y) / len(shots_y)
-        latest_x = trend_x
-        latest_y = trend_y
     else:
-        trend_x = 0
-        trend_y = 110
         latest_x = 0
         latest_y = 110
+    trend_x = 0
+    trend_y = 110
+
         
     ellipse_x = [-6.8, -3.8, -1.2, 1.8, 4.8, 5.8, 4.2, 1.5, -1.8, -4.8, -6.0, -5.4, -3.0, 0.0, 2.8, 4.8, 3.2, 0.4, -2.8, -5.8, -6.8]
     ellipse_y = [115.8, 119.2, 120.8, 120.3, 117.2, 112.0, 107.6, 105.2, 104.8, 106.0, 109.2, 113.4, 117.2, 118.8, 118.0, 115.2, 111.0, 108.2, 107.2, 110.0, 115.8]
