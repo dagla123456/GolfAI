@@ -435,8 +435,13 @@ def build_premium_dispersion():
     return fig
 
 
-def render_v4_dashboard_premium(detector_results=None):
-    performance_score = get_performance_context(detector_results)
+def render_v4_dashboard_premium(detector_results=None, pipeline_output=None):
+    if pipeline_output:
+        session_summary = pipeline_output["session_summary"]
+        performance_score = session_summary.get("performance_score", 0)
+    else:
+        session_summary = {}
+        performance_score = get_performance_context(detector_results)
 
     st.markdown(get_premium_css(), unsafe_allow_html=True)
 
