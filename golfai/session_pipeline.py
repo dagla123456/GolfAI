@@ -35,6 +35,7 @@ def build_session_summary(detector_results, club="7i"):
         "carry_std_score": detector_results.get("carry_std_score", 0),
         "blueprint_match_pct": detector_results.get("blueprint_match_pct", 0),
         "corridor_pct": detector_results.get("corridor_pct", 0),
+        "shot_pattern_data": detector_results.get("shot_pattern_data", {}),
 
         "momentum_last20": detector_results.get("momentum_last20", 0),
         "drift_detected": detector_results.get("drift_detected", False),
