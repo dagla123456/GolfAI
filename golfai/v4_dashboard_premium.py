@@ -195,45 +195,50 @@ def render_premium_distance_card():
     components.html(html, height=132)
 
 
-def render_premium_summary_card():
-    html = """
+def render_premium_summary_card(session_summary):
+    strike_quality = session_summary.get("strike_quality", 0)
+    blueprint_match = session_summary.get("blueprint_match_pct", 0)
+    corridor_pct = session_summary.get("corridor_pct", 0)
+    performance_score = session_summary.get("performance_score", 0)
+    primary_issue = session_summary.get("primary_issue", "Unknown")
+
+    html = f"""
     <div style="color:#eef3f7;font-family:Arial,sans-serif;padding-top:1px;">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
             <div style="background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 8px 7px 8px;">
                 <div style="font-size:9px;color:#c7d4da;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;">Strike Quality</div>
-                <div style="font-size:22px;color:#f5f7fa;font-weight:800;line-height:1;margin-bottom:4px;">65</div>
-                <div style="font-size:10px;color:#1ed760;font-weight:700;">▲ +6</div>
+                <div style="font-size:22px;color:#f5f7fa;font-weight:800;line-height:1;margin-bottom:4px;">{strike_quality}</div>
+                <div style="font-size:10px;color:#ffd166;font-weight:700;">Live</div>
             </div>
 
             <div style="background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 8px 7px 8px;">
                 <div style="font-size:9px;color:#c7d4da;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;">Blueprint</div>
-                <div style="font-size:22px;color:#f5f7fa;font-weight:800;line-height:1;margin-bottom:4px;">52%</div>
-                <div style="font-size:10px;color:#1ed760;font-weight:700;">▲ +7</div>
+                <div style="font-size:22px;color:#f5f7fa;font-weight:800;line-height:1;margin-bottom:4px;">{blueprint_match:.1f}%</div>
+                <div style="font-size:10px;color:#ffd166;font-weight:700;">Live</div>
             </div>
 
             <div style="background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 8px 7px 8px;">
                 <div style="font-size:9px;color:#c7d4da;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;">Dispersion</div>
-                <div style="font-size:22px;color:#f5f7fa;font-weight:800;line-height:1;margin-bottom:4px;">29</div>
-                <div style="font-size:10px;color:#ff7f7f;font-weight:700;">▼ -4</div>
+                <div style="font-size:22px;color:#f5f7fa;font-weight:800;line-height:1;margin-bottom:4px;">{corridor_pct:.1f}%</div>
+                <div style="font-size:10px;color:#ffd166;font-weight:700;">Corridor</div>
             </div>
 
             <div style="background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 8px 7px 8px;">
-                <div style="font-size:9px;color:#c7d4da;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;">Efficiency</div>
-                <div style="font-size:22px;color:#f5f7fa;font-weight:800;line-height:1;margin-bottom:4px;">1.31</div>
-                <div style="font-size:10px;color:#ffd166;font-weight:700;">● Stable</div>
+                <div style="font-size:9px;color:#c7d4da;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;">Performance</div>
+                <div style="font-size:22px;color:#f5f7fa;font-weight:800;line-height:1;margin-bottom:4px;">{performance_score}</div>
+                <div style="font-size:10px;color:#ffd166;font-weight:700;">Score</div>
             </div>
         </div>
 
         <div style="background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:8px 9px;">
             <div style="font-size:9px;color:#9fd9b4;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:3px;">Session Read</div>
             <div style="font-size:11px;color:#f3fbf6;font-weight:700;line-height:1.2;">
-                Contact improving. Start line still the key limiter.
+                Primary issue: {primary_issue}
             </div>
         </div>
     </div>
     """
     components.html(html, height=235)
-
 
 def render_premium_focus_card():
     html = """
