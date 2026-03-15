@@ -553,8 +553,8 @@ def render_v4_dashboard_premium(detector_results=None, pipeline_output=None):
 
         if detector_results and "dispersion_info" in detector_results:
             disp = detector_results["dispersion_info"]
-            bias_value = disp.get("bias_label", "Unknown")
-            width_value = f"{disp.get('width_m', 0):.1f}m"
+            bias_value = disp.get("miss_bias", "Unknown")
+            width_value = f"{disp.get('side_std', 0) * 2:.1f}m"
 
         st.markdown(
             f"""
