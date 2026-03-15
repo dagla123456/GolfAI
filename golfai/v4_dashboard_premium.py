@@ -274,6 +274,7 @@ def render_premium_focus_card():
 def build_progress_chart():
 
     history = load_history()
+    print("Progress chart history length:", len(history))
 
     if len(history) < 2:
         return go.Figure()
