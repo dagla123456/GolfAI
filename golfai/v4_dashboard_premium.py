@@ -547,15 +547,24 @@ def render_v4_dashboard_premium(detector_results=None, pipeline_output=None):
 
     with main_right:
         premium_card_open("Shot Dispersion")
+
+        bias_value = "Unknown"
+        width_value = "0.0m"
+
+        if detector_results and "dispersion_info" in detector_results:
+            disp = detector_results["dispersion_info"]
+            bias_value = disp.get("bias_label", "Unknown")
+            width_value = f"{disp.get('width_m', 0):.1f}m"
+
         st.markdown(
-            """
+            f"""
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
                 <div>
                     <div style="font-size:11px;color:#9fd9b4;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:2px;">
                         Bias
                     </div>
                     <div style="font-size:17px;color:#f5f7fa;font-weight:800;line-height:1;">
-                        Slight Left
+                        {bias_value}
                     </div>
                 </div>
                 <div style="text-align:right;">
@@ -563,7 +572,7 @@ def render_v4_dashboard_premium(detector_results=None, pipeline_output=None):
                         Width
                     </div>
                     <div style="font-size:17px;color:#f5f7fa;font-weight:800;line-height:1;">
-                        8.4m
+                        {width_value}
                     </div>
                 </div>
             </div>
