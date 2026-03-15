@@ -1,11 +1,12 @@
 """
 GolfAI Streamlit App
-Version: v2.0
+Version: v2.1
 
 Change Summary:
-- Switches Command Centre to the new premium dashboard build
+- Uses premium dashboard
 - Keeps On Course mode
-- Preserves top mode switch for tablet-friendly use
+- Keeps tablet-friendly top mode switch
+- Prepares dashboard to accept real pipeline data later
 """
 
 import streamlit as st
@@ -55,7 +56,15 @@ mode = st.radio(
     label_visibility="collapsed"
 )
 
+# Temporary placeholders until real CSV/session pipeline
+# is connected directly into the Streamlit app flow.
+detector_results = None
+pipeline_output = None
+
 if mode == "Command Centre":
-    render_v4_dashboard_premium(detector_results=detector_results, pipeline_output=pipeline_output)
+    render_v4_dashboard_premium(
+        detector_results=detector_results,
+        pipeline_output=pipeline_output
+    )
 else:
     oncourse_page()
