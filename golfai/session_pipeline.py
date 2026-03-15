@@ -19,7 +19,7 @@ def build_session_summary(detector_results, club="7i"):
     score_data = build_session_score(detector_results)
 
     session_summary = {
-        "session_id": generate_session_id(),
+        "session_id": f"{club}_{detector_results.get('source_session_file', generate_session_id())}",
         "timestamp": datetime.utcnow().isoformat(),
         "club": club,
 
