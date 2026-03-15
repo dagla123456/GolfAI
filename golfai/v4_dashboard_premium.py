@@ -344,14 +344,16 @@ def build_progress_chart():
     return fig
 
 
-def build_premium_dispersion():
-    shots_x = [-2.8, -1.5, -0.3, 0.8, 2.1, -1.2, 0.5, 1.6, -0.8, 2.8, -2.2, 0.2, 1.2, -1.9, 2.4]
-    shots_y = [104, 108, 111, 109, 105, 114, 116, 113, 118, 107, 110, 112, 109, 111, 114]
+def build_premium_dispersion(detector_results=None):
+    if detector_results and "shot_pattern_data" in detector_results:
+        shot_data = detector_results["shot_pattern_data"]
+        points = shot_data.get("shot_pattern_points", [])
 
-    latest_x = 0.4
-    latest_y = 110.5
-    trend_x = -0.6
-    trend_y = 109.4
+        shots_x = [p[0] for p in points]
+        shots_y = [p[1] for p in points]
+    else:
+        shots_x = []
+        shots_y = []
 
     ellipse_x = [-6.8, -3.8, -1.2, 1.8, 4.8, 5.8, 4.2, 1.5, -1.8, -4.8, -6.0, -5.4, -3.0, 0.0, 2.8, 4.8, 3.2, 0.4, -2.8, -5.8, -6.8]
     ellipse_y = [115.8, 119.2, 120.8, 120.3, 117.2, 112.0, 107.6, 105.2, 104.8, 106.0, 109.2, 113.4, 117.2, 118.8, 118.0, 115.2, 111.0, 108.2, 107.2, 110.0, 115.8]
@@ -559,7 +561,7 @@ def render_v4_dashboard_premium(detector_results=None, pipeline_output=None):
             unsafe_allow_html=True,
         )
         st.plotly_chart(
-            build_premium_dispersion(),
+            build_premium_dispersion(detector_results),
             use_container_width=True,
             config={"displayModeBar": False},
         )
