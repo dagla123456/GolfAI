@@ -67,7 +67,7 @@ mode = st.radio(
 detector_results = None
 pipeline_output = None
 
-data_path = "/kaggle/input/datasets/daveg1234/golf-ai-data"
+data_path = "data"
 csv_files = glob.glob(os.path.join(data_path, "*.csv"))
 
 st.write("Data path exists:", os.path.exists(data_path))
