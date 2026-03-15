@@ -56,6 +56,6 @@ mode = st.radio(
 )
 
 if mode == "Command Centre":
-    render_v4_dashboard_premium()
+    render_v4_dashboard_premium(detector_results=detector_results, pipeline_output=pipeline_output)
 else:
     oncourse_page()
