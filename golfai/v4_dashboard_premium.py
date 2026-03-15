@@ -354,19 +354,44 @@ def build_premium_dispersion(detector_results=None):
     else:
         shots_x = []
         shots_y = []
+
+    # Latest session centroid
     if shots_x and shots_y:
-        trend_x = sum(shots_x) / len(shots_x)
-        trend_y = sum(shots_y) / len(shots_y)
+        latest_x = sum(shots_x) / len(shots_x)
+        latest_y = sum(shots_y) / len(shots_y)
     else:
         latest_x = 0
         latest_y = 110
-    trend_x = 0
-    trend_y = 110
 
-        
+    # Last 5 sessions centroid (trend)
+    from golfai.session_history import load_history
+
+    history = load_history()
+
+    trend_x = latest_x
+    trend_y = latest_y
+
+    if len(history) >= 5:
+        last5 = history[-5:]
+
+        xs = []
+        ys = []
+
+        for s in last5:
+            info = s.get("shot_pattern_data", {})
+            points = info.get("shot_pattern_points", [])
+
+            for p in points:
+                xs.append(p[0])
+                ys.append(p[1])
+
+        if xs and ys:
+            trend_x = sum(xs) / len(xs)
+            trend_y = sum(ys) / len(ys)
+
     ellipse_x = [-6.8, -3.8, -1.2, 1.8, 4.8, 5.8, 4.2, 1.5, -1.8, -4.8, -6.0, -5.4, -3.0, 0.0, 2.8, 4.8, 3.2, 0.4, -2.8, -5.8, -6.8]
     ellipse_y = [115.8, 119.2, 120.8, 120.3, 117.2, 112.0, 107.6, 105.2, 104.8, 106.0, 109.2, 113.4, 117.2, 118.8, 118.0, 115.2, 111.0, 108.2, 107.2, 110.0, 115.8]
-
+    
     fig = go.Figure()
 
     fig.add_hrect(y0=98, y1=122, fillcolor="rgba(255,255,255,0.010)", line_width=0, layer="below")
